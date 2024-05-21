@@ -1,5 +1,5 @@
 {
-    "name": "klkvsk/beeline-ord-api-client",
+    "name": "devfindsport/beeline-ord-api-client",
     "description": "API client for Beeline ORD system",
     "type": "library",
     "license": "MIT",
