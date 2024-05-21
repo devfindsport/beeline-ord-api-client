@@ -8,6 +8,7 @@ use BeelineOrd\Authorization\Credentials;
 use BeelineOrd\Endpoint\AuthorizationEndpoint;
 use BeelineOrd\Endpoint\ContractEndpoint;
 use BeelineOrd\Endpoint\CreativeEndpoint;
+use BeelineOrd\Endpoint\InvoiceEndpoint;
 use BeelineOrd\Endpoint\PlatformEndpoint;
 use BeelineOrd\Endpoint\UserEndpoint;
 use BeelineOrd\Exception\ResponseValidationException;
@@ -45,12 +46,14 @@ class ApiClient
     protected PlatformEndpoint $platformEndpoint;
     protected ContractEndpoint $contractEndpoint;
     protected CreativeEndpoint $creativeEndpoint;
+    protected InvoiceEndpoint $invoiceEndpoint;
 
     public function __construct(
         Credentials         $credentials,
         AuthorizationToken  $token = null,
         HttpClientInterface $httpClient = null,
-        LoggerInterface     $logger = null
+        LoggerInterface     $logger = null,
+        string $apiEndpoint = 'https://ord.beeline.ru/ordapi'
     )
     {
         $httpClientBuilder = new PluginClientBuilder();
@@ -62,6 +65,7 @@ class ApiClient
         $this->httpClient = $httpClientBuilder->createClient($httpClient ?: Psr18ClientDiscovery::find());
 
         // TODO: convert to httplug plugin
+        $this->apiEndpoint = $apiEndpoint;
         $this->authHttpClient = new HttpClientAuthWrapper($this, $this->httpClient, $credentials, $token);
 
         $this->requestFactory = $this->uriFactory = new Psr17Factory();
@@ -71,6 +75,7 @@ class ApiClient
         $this->platformEndpoint = new PlatformEndpoint($this);
         $this->contractEndpoint = new ContractEndpoint($this);
         $this->creativeEndpoint = new CreativeEndpoint($this);
+        $this->invoiceEndpoint = new InvoiceEndpoint($this);
     }
 
     public function getToken(): AuthorizationToken
@@ -96,6 +101,11 @@ class ApiClient
     public function creative(): CreativeEndpoint
     {
         return $this->creativeEndpoint;
+    }
+
+    public function invoice(): InvoiceEndpoint
+    {
+        return $this->invoiceEndpoint;
     }
 
     /**

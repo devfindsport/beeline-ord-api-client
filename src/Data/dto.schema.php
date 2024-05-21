@@ -306,6 +306,12 @@ return dto\schema(
                 dto\field('erirPlannedExportDate', t\date()),
             ]
         ),
+        dto\object(
+            name: 'Invoice\\InvoiceImportResult',
+            fields: [
+                dto\field('ids', t\list_(t\int())),
+            ]
+        ),
         // ---
 
         // INVOICE ITEM:
@@ -330,6 +336,12 @@ return dto\schema(
             extends: 'InvoiceItem\\InvoiceItemCreateModel',
             fields: [
                 dto\field('id', t\int(), true),
+            ]
+        ),
+        dto\object(
+            name: 'InvoiceItem\\InvoiceItemImportResult',
+            fields: [
+                dto\field('ids', t\list_(t\int())),
             ]
         ),
         // ---
@@ -362,7 +374,12 @@ return dto\schema(
             name: 'InvoiceItemStatistics\\InvoiceItemStatisticsViewModel',
             extends: 'InvoiceItemStatistics\\InvoiceItemStatisticsCreateModel',
         ),
-
+        dto\object(
+            name: 'InvoiceItemStatistics\\InvoiceItemStatisticsImportResult',
+            fields: [
+                dto\field('ids', t\list_(t\int())),
+            ]
+        ),
 
         // FOREIGN ORGANIZATIONS
         dto\enum(
