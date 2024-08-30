@@ -21,7 +21,7 @@ class CreativeContentUploadResult implements \JsonSerializable
     /** @var ?array<CreativeContentUploadResultFileError> $fileErrors */
     protected ?array $fileErrors;
     /** @var ?array<int> $uploadedIds */
-    protected ?array $uploadedIds;
+    protected ?array $uploadedIds = [];
 
     public function __construct(
         ?string $erid = null,
