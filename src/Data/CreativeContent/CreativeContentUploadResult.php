@@ -20,18 +20,22 @@ class CreativeContentUploadResult implements \JsonSerializable
 
     /** @var ?array<CreativeContentUploadResultFileError> $fileErrors */
     protected ?array $fileErrors;
+    /** @var ?array<int> $uploadedIds */
+    protected ?array $uploadedIds;
 
     public function __construct(
         ?string $erid = null,
         ?int $filesCount = null,
         ?int $uploadedFilesCount = null,
-        ?array $fileErrors = []
+        ?array $fileErrors = [],
+        ?array $uploadedIds = []
     ) {
         $this->erid = $erid;
         $this->filesCount = $filesCount;
         $this->uploadedFilesCount = $uploadedFilesCount;
         $fileErrors && (function(CreativeContentUploadResultFileError ...$_) {})( ...$fileErrors);
         $this->fileErrors = $fileErrors;
+        $uploadedIds && (function(int ...$_) {})( ...$uploadedIds);
     }
 
     public function getErid(): ?string
@@ -58,6 +62,14 @@ class CreativeContentUploadResult implements \JsonSerializable
     }
 
     /**
+     * @return ?array<int>
+     */
+    public function getUploadedIds(): ?array
+    {
+        return $this->uploadedIds;
+    }
+
+    /**
      * @return iterable<int,\Closure>
      */
     protected static function importers(string $key): iterable
@@ -65,6 +77,13 @@ class CreativeContentUploadResult implements \JsonSerializable
         switch ($key) {
             case "erid":
                 yield \Closure::fromCallable('strval');
+                break;
+
+            case "uploadedIds":
+                yield fn ($array) => array_map(
+                    \Closure::fromCallable('intval'),
+                    (array)$array
+                );
                 break;
 
             case "filesCount":
@@ -103,7 +122,8 @@ class CreativeContentUploadResult implements \JsonSerializable
             $constructorParams["erid"] ?? null,
             $constructorParams["filesCount"] ?? null,
             $constructorParams["uploadedFilesCount"] ?? null,
-            $constructorParams["fileErrors"] ?? null
+            $constructorParams["fileErrors"] ?? null,
+            $constructorParams["uploadedIds"] ?? null
         );
     }
 

@@ -249,6 +249,7 @@ return dto\schema(
                 dto\field('filesCount', t\int()),
                 dto\field('uploadedFilesCount', t\int()),
                 dto\field('fileErrors', t\list_(t\object('CreativeContent\\CreativeContentUploadResultFileError'))),
+                dto\field('uploadedIds', t\list_(t\int())),
             ]
         ),
         dto\object(
