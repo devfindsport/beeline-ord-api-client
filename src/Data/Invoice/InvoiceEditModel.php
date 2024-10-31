@@ -19,7 +19,7 @@ class InvoiceEditModel implements \JsonSerializable
     protected \DateTimeInterface $startDate;
     protected \DateTimeInterface $endDate;
     protected float $amount;
-    protected bool $isVat;
+    protected ?bool $isVat;
     protected InvoiceOrganizationRole $customerRole;
     protected InvoiceOrganizationRole $executorRole;
     protected bool $isReadyForErir;
@@ -29,11 +29,11 @@ class InvoiceEditModel implements \JsonSerializable
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
         float $amount,
-        bool $isVat,
         InvoiceOrganizationRole $customerRole,
         InvoiceOrganizationRole $executorRole,
         bool $isReadyForErir,
-        ?string $number = null
+        ?string $number = null,
+        ?bool $isVat = null
     ) {
         $this->number = $number;
         $this->date = $date;
@@ -71,7 +71,7 @@ class InvoiceEditModel implements \JsonSerializable
         return $this->amount;
     }
 
-    public function getIsVat(): bool
+    public function getIsVat(): ?bool
     {
         return $this->isVat;
     }
@@ -93,7 +93,7 @@ class InvoiceEditModel implements \JsonSerializable
 
     protected static function required(): array
     {
-        return ['date', 'startDate', 'endDate', 'amount', 'isVat', 'customerRole', 'executorRole', 'isReadyForErir'];
+        return ['date', 'startDate', 'endDate', 'amount', 'customerRole', 'executorRole', 'isReadyForErir'];
     }
 
     /**
@@ -156,11 +156,11 @@ class InvoiceEditModel implements \JsonSerializable
             $constructorParams["startDate"],
             $constructorParams["endDate"],
             $constructorParams["amount"],
-            $constructorParams["isVat"],
             $constructorParams["customerRole"],
             $constructorParams["executorRole"],
             $constructorParams["isReadyForErir"],
-            $constructorParams["number"] ?? null
+            $constructorParams["number"] ?? null,
+            $constructorParams["isVat"] ?? null
         );
     }
 

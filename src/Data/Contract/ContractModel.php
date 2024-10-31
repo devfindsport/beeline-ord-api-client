@@ -21,7 +21,7 @@ class ContractModel implements \JsonSerializable
     protected string $number;
     protected \DateTimeInterface $date;
     protected ?float $amount;
-    protected bool $isVat;
+    protected ?bool $isVat;
     protected ?int $parentContractId;
     protected ?int $customerId;
     protected ?int $executorId;
@@ -40,8 +40,8 @@ class ContractModel implements \JsonSerializable
         string $subjectType,
         string $number,
         \DateTimeInterface $date,
-        bool $isVat,
         ?float $amount = null,
+        ?bool $isVat = null,
         ?int $parentContractId = null,
         ?int $customerId = null,
         ?int $executorId = null,
@@ -108,7 +108,7 @@ class ContractModel implements \JsonSerializable
         return $this->amount;
     }
 
-    public function getIsVat(): bool
+    public function getIsVat(): ?bool
     {
         return $this->isVat;
     }
@@ -165,7 +165,7 @@ class ContractModel implements \JsonSerializable
 
     protected static function required(): array
     {
-        return ['type', 'executorIsObligedForRegistration', 'actionType', 'subjectType', 'number', 'date', 'isVat'];
+        return ['type', 'executorIsObligedForRegistration', 'actionType', 'subjectType', 'number', 'date'];
     }
 
     /**
@@ -248,8 +248,8 @@ class ContractModel implements \JsonSerializable
             $constructorParams["subjectType"],
             $constructorParams["number"],
             $constructorParams["date"],
-            $constructorParams["isVat"],
             $constructorParams["amount"] ?? null,
+            $constructorParams["isVat"] ?? null,
             $constructorParams["parentContractId"] ?? null,
             $constructorParams["customerId"] ?? null,
             $constructorParams["executorId"] ?? null,

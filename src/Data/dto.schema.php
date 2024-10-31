@@ -89,7 +89,7 @@ return dto\schema(
                 dto\field('number', t\string(), true),
                 dto\field('date', t\date(), true),
                 dto\field('amount', t\float()),
-                dto\field('isVat', t\bool(), true),
+                dto\field('isVat', t\bool()),
                 dto\field('parentContractId', t\int()),
                 dto\field('customerId', t\int()),
                 dto\field('executorId', t\int()),
@@ -123,9 +123,10 @@ return dto\schema(
                 dto\field('id', t\int(), true),
                 dto\field('parentContractId', t\int()),
 
-                // not in doc, but in api response:
                 dto\field('erirExportedOn', t\date()),
                 dto\field('erirPlannedExportDate', t\date()),
+                dto\field('erirExportedStatus', t\int()),
+                dto\field('exportError', t\bool()),
             ]
         ),
         // ---
@@ -135,7 +136,9 @@ return dto\schema(
             'Other', 'PayForViews', 'PayForClicks', 'PayForActions',
         ]),
         dto\enum('Creative\\CreativeForm', [
-            'Banner', 'TextBlock', 'TextGraphicBlock', 'Video', 'AudioRecord', 'LiveAudio', 'LiveVideo', 'Other',
+            'TextGraphicBlock', 'TextBlock', 'Video', 'LiveVideo', 'LiveAudio', 'Banner', 'AudioRecord', 'TextVideoBlock',
+            'TextGraphicVideoBlock', 'TextAudioBlock', 'TextGraphicAudioBlock', 'TextAudioVideoBlock', 'TextGraphicAudioVideoBlock',
+            'BannerHtml5',
         ]),
 
         dto\object(
@@ -178,9 +181,13 @@ return dto\schema(
             fields: [
                 dto\field('id', t\int(), true),
                 dto\field('description', t\string(), true),
-                dto\field('erid', t\string(), true),
+                dto\field('erid', t\string()),
                 dto\field('erirExportedOn', t\date()),
                 dto\field('erirPlannedExportDate', t\date()),
+                dto\field('erirExportedStatus', t\int()),
+                dto\field('exportError', t\string()),
+                dto\field('selfPromotionOrganizationId', t\int()),
+                dto\field('isTelegram', t\bool()),
             ]
         ),
         dto\object(
@@ -284,7 +291,7 @@ return dto\schema(
                 dto\field('startDate', t\date(), true),
                 dto\field('endDate', t\date(), true),
                 dto\field('amount', t\float(), true),
-                dto\field('isVat', t\bool(), true),
+                dto\field('isVat', t\bool()),
                 dto\field('customerRole', t\enum('Invoice\\InvoiceOrganizationRole'), true),
                 dto\field('executorRole', t\enum('Invoice\\InvoiceOrganizationRole'), true),
                 dto\field('isReadyForErir', t\bool(), true),
@@ -314,7 +321,7 @@ return dto\schema(
             fields: [
                 dto\field('name', t\string()),
                 dto\field('amount', t\float(), true),
-                dto\field('isVat', t\bool(), true),
+                dto\field('isVat', t\bool()),
                 dto\field('initialContractId', t\int(), true),
             ]
         ),
@@ -346,7 +353,7 @@ return dto\schema(
                 dto\field('actualEndDate', t\date(), true),
                 dto\field('totalAmount', t\float(), true),
                 dto\field('amountPerShow', t\float(), true),
-                dto\field('isVat', t\bool(), true),
+                dto\field('isVat', t\bool()),
             ]
         ),
         dto\object(

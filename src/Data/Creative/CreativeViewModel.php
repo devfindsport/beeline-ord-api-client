@@ -32,20 +32,34 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
     public function __construct(
         int $id,
         string $description,
-        string $erid,
         CreativeType $type,
         CreativeForm $form,
         bool $isSocial,
         bool $isNative,
         int $initialContractId,
+        ?string $erid = null,
         ?\DateTimeInterface $erirExportedOn = null,
         ?\DateTimeInterface $erirPlannedExportDate = null,
+        ?int $erirExportedStatus = null,
+        ?string $exportError = null,
+        ?int $selfPromotionOrganizationId = null,
+        ?bool $isTelegram = null,
         array $urls = [],
         ?array $okveds = [],
         ?string $targetAudienceDescription = null,
         ?int $organizationId = null
     ) {
-        parent::__construct($id, $description, $erid, $erirExportedOn, $erirPlannedExportDate);
+        parent::__construct(
+            $id,
+            $description,
+            $erid,
+            $erirExportedOn,
+            $erirPlannedExportDate,
+            $erirExportedStatus,
+            $exportError,
+            $selfPromotionOrganizationId,
+            $isTelegram
+        );
         $this->type = $type;
         $this->form = $form;
         $this->description = $description;
@@ -211,14 +225,18 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
         return new static(
             $constructorParams["id"],
             $constructorParams["description"],
-            $constructorParams["erid"],
             $constructorParams["type"],
             $constructorParams["form"],
             $constructorParams["isSocial"],
             $constructorParams["isNative"],
             $constructorParams["initialContractId"],
+            $constructorParams["erid"] ?? null,
             $constructorParams["erirExportedOn"] ?? null,
             $constructorParams["erirPlannedExportDate"] ?? null,
+            $constructorParams["erirExportedStatus"] ?? null,
+            $constructorParams["exportError"] ?? null,
+            $constructorParams["selfPromotionOrganizationId"] ?? null,
+            $constructorParams["isTelegram"] ?? null,
             $constructorParams["urls"],
             $constructorParams["okveds"] ?? null,
             $constructorParams["targetAudienceDescription"] ?? null,
