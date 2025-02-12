@@ -22,7 +22,7 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
     protected \DateTimeInterface $actualEndDate;
     protected float $totalAmount;
     protected float $amountPerShow;
-    protected bool $isVat;
+    protected ?bool $isVat;
 
     public function __construct(
         int $actualImpressionsCount,
@@ -33,7 +33,7 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
         \DateTimeInterface $actualEndDate,
         float $totalAmount,
         float $amountPerShow,
-        bool $isVat
+        ?bool $isVat = null
     ) {
         $this->actualImpressionsCount = $actualImpressionsCount;
         $this->plannedImpressionsCount = $plannedImpressionsCount;
@@ -86,7 +86,7 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
         return $this->amountPerShow;
     }
 
-    public function getIsVat(): bool
+    public function getIsVat(): ?bool
     {
         return $this->isVat;
     }
@@ -102,7 +102,6 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
             'actualEndDate',
             'totalAmount',
             'amountPerShow',
-            'isVat',
         ];
     }
 
@@ -167,7 +166,7 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
             $constructorParams["actualEndDate"],
             $constructorParams["totalAmount"],
             $constructorParams["amountPerShow"],
-            $constructorParams["isVat"]
+            $constructorParams["isVat"] ?? null
         );
     }
 

@@ -22,15 +22,15 @@ class InvoiceCreateModel extends InvoiceEditModel implements \JsonSerializable
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
         float $amount,
-        bool $isVat,
         InvoiceOrganizationRole $customerRole,
         InvoiceOrganizationRole $executorRole,
         bool $isReadyForErir,
         int $contractId,
         InvoiceType $type,
-        ?string $number = null
+        ?string $number = null,
+        ?bool $isVat = null
     ) {
-        parent::__construct($date, $startDate, $endDate, $amount, $isVat, $customerRole, $executorRole, $isReadyForErir, $number);
+        parent::__construct($date, $startDate, $endDate, $amount, $customerRole, $executorRole, $isReadyForErir, $number, $isVat);
         $this->contractId = $contractId;
         $this->type = $type;
     }
@@ -113,13 +113,13 @@ class InvoiceCreateModel extends InvoiceEditModel implements \JsonSerializable
             $constructorParams["startDate"],
             $constructorParams["endDate"],
             $constructorParams["amount"],
-            $constructorParams["isVat"],
             $constructorParams["customerRole"],
             $constructorParams["executorRole"],
             $constructorParams["isReadyForErir"],
             $constructorParams["contractId"],
             $constructorParams["type"],
-            $constructorParams["number"] ?? null
+            $constructorParams["number"] ?? null,
+            $constructorParams["isVat"] ?? null
         );
     }
 

@@ -16,10 +16,10 @@ class InvoiceItemEditModel implements \JsonSerializable
 {
     protected ?string $name;
     protected float $amount;
-    protected bool $isVat;
+    protected ?bool $isVat;
     protected int $initialContractId;
 
-    public function __construct(float $amount, bool $isVat, int $initialContractId, ?string $name = null)
+    public function __construct(float $amount, int $initialContractId, ?string $name = null, ?bool $isVat = null)
     {
         $this->name = $name;
         $this->amount = $amount;
@@ -37,7 +37,7 @@ class InvoiceItemEditModel implements \JsonSerializable
         return $this->amount;
     }
 
-    public function getIsVat(): bool
+    public function getIsVat(): ?bool
     {
         return $this->isVat;
     }
@@ -49,7 +49,7 @@ class InvoiceItemEditModel implements \JsonSerializable
 
     protected static function required(): array
     {
-        return ['amount', 'isVat', 'initialContractId'];
+        return ['amount', 'initialContractId'];
     }
 
     /**
@@ -101,9 +101,9 @@ class InvoiceItemEditModel implements \JsonSerializable
         /** @psalm-suppress PossiblyNullArgument */
         return new static(
             $constructorParams["amount"],
-            $constructorParams["isVat"],
             $constructorParams["initialContractId"],
-            $constructorParams["name"] ?? null
+            $constructorParams["name"] ?? null,
+            $constructorParams["isVat"] ?? null
         );
     }
 

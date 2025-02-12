@@ -18,6 +18,8 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
     protected ?int $parentContractId;
     protected ?\DateTimeInterface $erirExportedOn;
     protected ?\DateTimeInterface $erirPlannedExportDate;
+    protected ?int $erirExportedStatus;
+    protected ?bool $exportError;
 
     public function __construct(
         ContractType $type,
@@ -26,9 +28,9 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
         string $subjectType,
         string $number,
         \DateTimeInterface $date,
-        bool $isVat,
         int $id,
         ?float $amount = null,
+        ?bool $isVat = null,
         ?int $parentContractId = null,
         ?int $customerId = null,
         ?int $executorId = null,
@@ -40,7 +42,9 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
         ?string $executorName = null,
         ?ContractOrganizationType $executorType = null,
         ?\DateTimeInterface $erirExportedOn = null,
-        ?\DateTimeInterface $erirPlannedExportDate = null
+        ?\DateTimeInterface $erirPlannedExportDate = null,
+        ?int $erirExportedStatus = null,
+        ?bool $exportError = null
     ) {
         parent::__construct(
             $type,
@@ -49,8 +53,8 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
             $subjectType,
             $number,
             $date,
-            $isVat,
             $amount,
+            $isVat,
             $parentContractId,
             $customerId,
             $executorId,
@@ -66,6 +70,8 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
         $this->parentContractId = $parentContractId;
         $this->erirExportedOn = $erirExportedOn;
         $this->erirPlannedExportDate = $erirPlannedExportDate;
+        $this->erirExportedStatus = $erirExportedStatus;
+        $this->exportError = $exportError;
     }
 
     public function getId(): int
@@ -86,6 +92,16 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
     public function getErirPlannedExportDate(): ?\DateTimeInterface
     {
         return $this->erirPlannedExportDate;
+    }
+
+    public function getErirExportedStatus(): ?int
+    {
+        return $this->erirExportedStatus;
+    }
+
+    public function getExportError(): ?bool
+    {
+        return $this->exportError;
     }
 
     protected static function defaults(): array
@@ -112,12 +128,17 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
         switch ($key) {
             case "id":
             case "parentContractId":
+            case "erirExportedStatus":
                 yield \Closure::fromCallable('intval');
                 break;
 
             case "erirExportedOn":
             case "erirPlannedExportDate":
                 yield static fn ($d) => new \DateTimeImmutable($d);
+                break;
+
+            case "exportError":
+                yield \Closure::fromCallable('boolval');
                 break;
 
             default:
@@ -160,9 +181,9 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
             $constructorParams["subjectType"],
             $constructorParams["number"],
             $constructorParams["date"],
-            $constructorParams["isVat"],
             $constructorParams["id"],
             $constructorParams["amount"] ?? null,
+            $constructorParams["isVat"] ?? null,
             $constructorParams["parentContractId"] ?? null,
             $constructorParams["customerId"] ?? null,
             $constructorParams["executorId"] ?? null,
@@ -174,7 +195,9 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
             $constructorParams["executorName"] ?? null,
             $constructorParams["executorType"] ?? null,
             $constructorParams["erirExportedOn"] ?? null,
-            $constructorParams["erirPlannedExportDate"] ?? null
+            $constructorParams["erirPlannedExportDate"] ?? null,
+            $constructorParams["erirExportedStatus"] ?? null,
+            $constructorParams["exportError"] ?? null
         );
     }
 

@@ -11,6 +11,10 @@ use BeelineOrd\Request\AbstractRequest;
  */
 class CreativeGetAllRequest extends AbstractRequest
 {
+    public function __construct()
+    {
+    }
+
     public function getMethod(): string
     {
         return 'GET /data/creative/list/byUser';

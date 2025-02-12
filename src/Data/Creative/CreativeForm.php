@@ -19,28 +19,40 @@ namespace BeelineOrd\Data\Creative;
  * @property-read string $value
  *
  * Cases:
- * @method static CreativeForm BANNER()
- * @method static CreativeForm TEXT_BLOCK()
  * @method static CreativeForm TEXT_GRAPHIC_BLOCK()
+ * @method static CreativeForm TEXT_BLOCK()
  * @method static CreativeForm VIDEO()
- * @method static CreativeForm AUDIO_RECORD()
- * @method static CreativeForm LIVE_AUDIO()
  * @method static CreativeForm LIVE_VIDEO()
- * @method static CreativeForm OTHER()
+ * @method static CreativeForm LIVE_AUDIO()
+ * @method static CreativeForm BANNER()
+ * @method static CreativeForm AUDIO_RECORD()
+ * @method static CreativeForm TEXT_VIDEO_BLOCK()
+ * @method static CreativeForm TEXT_GRAPHIC_VIDEO_BLOCK()
+ * @method static CreativeForm TEXT_AUDIO_BLOCK()
+ * @method static CreativeForm TEXT_GRAPHIC_AUDIO_BLOCK()
+ * @method static CreativeForm TEXT_AUDIO_VIDEO_BLOCK()
+ * @method static CreativeForm TEXT_GRAPHIC_AUDIO_VIDEO_BLOCK()
+ * @method static CreativeForm BANNER_HTML5()
  */
 final class CreativeForm implements \JsonSerializable
 {
     private static array $instances = [];
 
     private static array $cases = [
-        'BANNER' => 'Banner',
-        'TEXT_BLOCK' => 'TextBlock',
         'TEXT_GRAPHIC_BLOCK' => 'TextGraphicBlock',
+        'TEXT_BLOCK' => 'TextBlock',
         'VIDEO' => 'Video',
-        'AUDIO_RECORD' => 'AudioRecord',
-        'LIVE_AUDIO' => 'LiveAudio',
         'LIVE_VIDEO' => 'LiveVideo',
-        'OTHER' => 'Other',
+        'LIVE_AUDIO' => 'LiveAudio',
+        'BANNER' => 'Banner',
+        'AUDIO_RECORD' => 'AudioRecord',
+        'TEXT_VIDEO_BLOCK' => 'TextVideoBlock',
+        'TEXT_GRAPHIC_VIDEO_BLOCK' => 'TextGraphicVideoBlock',
+        'TEXT_AUDIO_BLOCK' => 'TextAudioBlock',
+        'TEXT_GRAPHIC_AUDIO_BLOCK' => 'TextGraphicAudioBlock',
+        'TEXT_AUDIO_VIDEO_BLOCK' => 'TextAudioVideoBlock',
+        'TEXT_GRAPHIC_AUDIO_VIDEO_BLOCK' => 'TextGraphicAudioVideoBlock',
+        'BANNER_HTML5' => 'BannerHtml5',
     ];
 
     private string $name;
@@ -58,14 +70,20 @@ final class CreativeForm implements \JsonSerializable
     public static function cases(): array
     {
         return [
-            self::BANNER(),
-            self::TEXT_BLOCK(),
             self::TEXT_GRAPHIC_BLOCK(),
+            self::TEXT_BLOCK(),
             self::VIDEO(),
-            self::AUDIO_RECORD(),
-            self::LIVE_AUDIO(),
             self::LIVE_VIDEO(),
-            self::OTHER(),
+            self::LIVE_AUDIO(),
+            self::BANNER(),
+            self::AUDIO_RECORD(),
+            self::TEXT_VIDEO_BLOCK(),
+            self::TEXT_GRAPHIC_VIDEO_BLOCK(),
+            self::TEXT_AUDIO_BLOCK(),
+            self::TEXT_GRAPHIC_AUDIO_BLOCK(),
+            self::TEXT_AUDIO_VIDEO_BLOCK(),
+            self::TEXT_GRAPHIC_AUDIO_VIDEO_BLOCK(),
+            self::BANNER_HTML5(),
         ];
     }
 

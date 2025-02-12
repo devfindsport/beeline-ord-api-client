@@ -18,13 +18,13 @@ class InvoiceItemViewModel extends InvoiceItemCreateModel implements \JsonSerial
 
     public function __construct(
         float $amount,
-        bool $isVat,
         int $initialContractId,
         int $invoiceId,
         int $id,
-        ?string $name = null
+        ?string $name = null,
+        ?bool $isVat = null
     ) {
-        parent::__construct($amount, $isVat, $initialContractId, $invoiceId, $name);
+        parent::__construct($amount, $initialContractId, $invoiceId, $name, $isVat);
         $this->id = $id;
     }
 
@@ -94,11 +94,11 @@ class InvoiceItemViewModel extends InvoiceItemCreateModel implements \JsonSerial
         /** @psalm-suppress PossiblyNullArgument */
         return new static(
             $constructorParams["amount"],
-            $constructorParams["isVat"],
             $constructorParams["initialContractId"],
             $constructorParams["invoiceId"],
             $constructorParams["id"],
-            $constructorParams["name"] ?? null
+            $constructorParams["name"] ?? null,
+            $constructorParams["isVat"] ?? null
         );
     }
 
