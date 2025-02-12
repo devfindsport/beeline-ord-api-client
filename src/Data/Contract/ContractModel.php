@@ -23,7 +23,7 @@ class ContractModel implements \JsonSerializable
         public readonly \DateTimeInterface $date,
         public readonly ?float $amount = null,
         public readonly ?bool $isVat = null,
-        public readonly ?int $parentContractId = null,
+        public ?int $parentContractId = null,
         public readonly ?int $customerId = null,
         public readonly ?int $executorId = null,
         public readonly ?bool $isInitialContract = null,

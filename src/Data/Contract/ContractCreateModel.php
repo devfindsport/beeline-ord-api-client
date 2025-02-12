@@ -24,7 +24,7 @@ class ContractCreateModel extends ContractEditModel implements \JsonSerializable
         bool $isReadyForErir,
         ?float $amount = null,
         ?bool $isVat = null,
-        public readonly ?int $parentContractId = null,
+        public ?int $parentContractId = null,
         ?int $customerId = null,
         ?int $executorId = null,
         ?bool $isInitialContract = null,

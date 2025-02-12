@@ -1,36 +1,15 @@
 # PHP client for Beeline ORD API
 
-[https://ord.beeline.ru/](https://ord.beeline.ru/)
 
-## This is not an official package
+TODO
 
-**No support guaranteed.**
+Если переключится на версию 8.1 и выше, то классы Dto генерируется с readonly параметрами,
+но проблема возникает с `\BeelineOrd\Data\Contract\ContractModel` и классами, которые его наследуют,
+а именно с `parentContractId`, которые `readonly` но при вызове `\BeelineOrd\Data\Contract\ContractCreateModel::__construct`
+происходит ошибка:
 
-Installation:
 ```
-composer require klkvsk/beeline-ord-api-client
-```
-
-Usage:
-```php
-<?php
-
-$client = new \BeelineOrd\ApiClient(
-    new \BeelineOrd\Authorization\Credentials('login', 'password'),
-    $token, // if saved from previous session
-);
-
-/** @see src/Endpoint/ */
-$client->contract()->....
-$client->creative()->....
-$client->invoice()->....
-$client->platform()->....
-
-// OR
-
-$client->send(new \BeelineOrd\Request\SomethingRequest());
-
-// save accessToken for next session:
-$token = $client->getToken();
+Cannot modify readonly property BeelineOrd\Data\Contract\ContractCreateModel::$parentContractId
 ```
 
+Поэтому в коде вручную поправлены `ContractModel` и `ContractCreateModel`.
