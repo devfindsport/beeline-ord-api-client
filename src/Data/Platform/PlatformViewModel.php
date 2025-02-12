@@ -14,47 +14,18 @@ namespace BeelineOrd\Data\Platform;
  */
 class PlatformViewModel extends PlatformCreateModel implements \JsonSerializable
 {
-    protected int $id;
-    protected ?\DateTimeInterface $erirExportedOn;
-    protected ?\DateTimeInterface $erirPlannedExportDate;
-    protected ?bool $isEditable;
-
     public function __construct(
         string $name,
         string $url,
         bool $isOwned,
         PlatformType $type,
-        int $id,
+        public readonly int $id,
         ?int $organizationId = null,
-        ?\DateTimeInterface $erirExportedOn = null,
-        ?\DateTimeInterface $erirPlannedExportDate = null,
-        ?bool $isEditable = null
+        public readonly ?\DateTimeInterface $erirExportedOn = null,
+        public readonly ?\DateTimeInterface $erirPlannedExportDate = null,
+        public readonly ?bool $isEditable = null
     ) {
         parent::__construct($name, $url, $isOwned, $type, $organizationId);
-        $this->id = $id;
-        $this->erirExportedOn = $erirExportedOn;
-        $this->erirPlannedExportDate = $erirPlannedExportDate;
-        $this->isEditable = $isEditable;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getErirExportedOn(): ?\DateTimeInterface
-    {
-        return $this->erirExportedOn;
-    }
-
-    public function getErirPlannedExportDate(): ?\DateTimeInterface
-    {
-        return $this->erirPlannedExportDate;
-    }
-
-    public function getIsEditable(): ?bool
-    {
-        return $this->isEditable;
     }
 
     protected static function defaults(): array
@@ -78,24 +49,11 @@ class PlatformViewModel extends PlatformCreateModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "erirExportedOn":
-            case "erirPlannedExportDate":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
-
-            case "isEditable":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "id" => [ intval(...) ],
+            "erirExportedOn", "erirPlannedExportDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            "isEditable" => [ boolval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -125,17 +83,7 @@ class PlatformViewModel extends PlatformCreateModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["name"],
-            $constructorParams["url"],
-            $constructorParams["isOwned"],
-            $constructorParams["type"],
-            $constructorParams["id"],
-            $constructorParams["organizationId"] ?? null,
-            $constructorParams["erirExportedOn"] ?? null,
-            $constructorParams["erirPlannedExportDate"] ?? null,
-            $constructorParams["isEditable"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

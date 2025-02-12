@@ -14,21 +14,13 @@ namespace BeelineOrd\Data\InvoiceItemStatistics;
  */
 class InvoiceItemStatisticsImportResult implements \JsonSerializable
 {
-    /** @var ?array<int> $ids */
-    protected ?array $ids;
-
-    public function __construct(?array $ids = [])
-    {
-        $ids && (function(int ...$_) {})( ...$ids);
-        $this->ids = $ids;
-    }
-
     /**
-     * @return ?array<int>
+     * @param ?array<int> $ids
      */
-    public function getIds(): ?array
-    {
-        return $this->ids;
+    public function __construct(
+        public readonly ?array $ids = []
+    ) {
+        $ids && (function(int ...$_) {})( ...$ids);
     }
 
     /**
@@ -36,13 +28,12 @@ class InvoiceItemStatisticsImportResult implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "ids":
-                yield fn ($array) => array_map(
-                    \Closure::fromCallable('intval'),
-                    (array)$array
-                );
-                break;
+        return match($key) {
+            "ids" => [ fn ($array) => array_map(
+                intval(...),
+                (array)$array
+            ) ],
+            default => []
         };
     }
 
@@ -64,9 +55,7 @@ class InvoiceItemStatisticsImportResult implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["ids"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

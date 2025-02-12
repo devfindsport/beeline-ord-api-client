@@ -14,35 +14,32 @@ namespace BeelineOrd\Data\Invoice;
  */
 class InvoiceCreateModel extends InvoiceEditModel implements \JsonSerializable
 {
-    protected int $contractId;
-    protected InvoiceType $type;
-
     public function __construct(
         \DateTimeInterface $date,
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
         float $amount,
+        float $percentVat,
         InvoiceOrganizationRole $customerRole,
         InvoiceOrganizationRole $executorRole,
         bool $isReadyForErir,
-        int $contractId,
-        InvoiceType $type,
+        public readonly int $contractId,
+        public readonly InvoiceType $type,
         ?string $number = null,
         ?bool $isVat = null
     ) {
-        parent::__construct($date, $startDate, $endDate, $amount, $customerRole, $executorRole, $isReadyForErir, $number, $isVat);
-        $this->contractId = $contractId;
-        $this->type = $type;
-    }
-
-    public function getContractId(): int
-    {
-        return $this->contractId;
-    }
-
-    public function getType(): InvoiceType
-    {
-        return $this->type;
+        parent::__construct(
+            $date,
+            $startDate,
+            $endDate,
+            $amount,
+            $percentVat,
+            $customerRole,
+            $executorRole,
+            $isReadyForErir,
+            $number,
+            $isVat
+        );
     }
 
     protected static function defaults(): array
@@ -66,19 +63,10 @@ class InvoiceCreateModel extends InvoiceEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "contractId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "type":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Invoice\InvoiceType', 'from' ], $data);
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "contractId" => [ intval(...) ],
+            "type" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Invoice\InvoiceType', 'from' ], $data) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -108,19 +96,7 @@ class InvoiceCreateModel extends InvoiceEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["date"],
-            $constructorParams["startDate"],
-            $constructorParams["endDate"],
-            $constructorParams["amount"],
-            $constructorParams["customerRole"],
-            $constructorParams["executorRole"],
-            $constructorParams["isReadyForErir"],
-            $constructorParams["contractId"],
-            $constructorParams["type"],
-            $constructorParams["number"] ?? null,
-            $constructorParams["isVat"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

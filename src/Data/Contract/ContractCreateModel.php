@@ -14,8 +14,6 @@ namespace BeelineOrd\Data\Contract;
  */
 class ContractCreateModel extends ContractEditModel implements \JsonSerializable
 {
-    protected ?int $parentContractId;
-
     public function __construct(
         ContractType $type,
         bool $executorIsObligedForRegistration,
@@ -26,7 +24,7 @@ class ContractCreateModel extends ContractEditModel implements \JsonSerializable
         bool $isReadyForErir,
         ?float $amount = null,
         ?bool $isVat = null,
-        ?int $parentContractId = null,
+        public readonly ?int $parentContractId = null,
         ?int $customerId = null,
         ?int $executorId = null,
         ?bool $isInitialContract = null,
@@ -58,12 +56,6 @@ class ContractCreateModel extends ContractEditModel implements \JsonSerializable
             $executorName,
             $executorType
         );
-        $this->parentContractId = $parentContractId;
-    }
-
-    public function getParentContractId(): ?int
-    {
-        return $this->parentContractId;
     }
 
     protected static function defaults(): array
@@ -87,15 +79,9 @@ class ContractCreateModel extends ContractEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "parentContractId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "parentContractId" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -125,27 +111,7 @@ class ContractCreateModel extends ContractEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["type"],
-            $constructorParams["executorIsObligedForRegistration"],
-            $constructorParams["actionType"],
-            $constructorParams["subjectType"],
-            $constructorParams["number"],
-            $constructorParams["date"],
-            $constructorParams["isReadyForErir"],
-            $constructorParams["amount"] ?? null,
-            $constructorParams["isVat"] ?? null,
-            $constructorParams["parentContractId"] ?? null,
-            $constructorParams["customerId"] ?? null,
-            $constructorParams["executorId"] ?? null,
-            $constructorParams["isInitialContract"] ?? null,
-            $constructorParams["customerInn"] ?? null,
-            $constructorParams["customerName"] ?? null,
-            $constructorParams["customerType"] ?? null,
-            $constructorParams["executorInn"] ?? null,
-            $constructorParams["executorName"] ?? null,
-            $constructorParams["executorType"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

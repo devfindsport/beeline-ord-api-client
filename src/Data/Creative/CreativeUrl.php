@@ -14,16 +14,9 @@ namespace BeelineOrd\Data\Creative;
  */
 class CreativeUrl implements \JsonSerializable
 {
-    protected string $url;
-
-    public function __construct(string $url)
-    {
-        $this->url = $url;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
+    public function __construct(
+        public readonly string $url
+    ) {
     }
 
     protected static function required(): array
@@ -36,10 +29,9 @@ class CreativeUrl implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "url":
-                yield \Closure::fromCallable('strval');
-                break;
+        return match($key) {
+            "url" => [ strval(...) ],
+            default => []
         };
     }
 
@@ -66,9 +58,7 @@ class CreativeUrl implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["url"]
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

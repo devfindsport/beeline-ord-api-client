@@ -14,23 +14,10 @@ namespace BeelineOrd\Data\CreativeContent;
  */
 class CreativeContentUploadResultFileError implements \JsonSerializable
 {
-    protected ?string $fileName;
-    protected ?string $error;
-
-    public function __construct(?string $fileName = null, ?string $error = null)
-    {
-        $this->fileName = $fileName;
-        $this->error = $error;
-    }
-
-    public function getFileName(): ?string
-    {
-        return $this->fileName;
-    }
-
-    public function getError(): ?string
-    {
-        return $this->error;
+    public function __construct(
+        public readonly ?string $fileName = null,
+        public readonly ?string $error = null
+    ) {
     }
 
     /**
@@ -38,11 +25,9 @@ class CreativeContentUploadResultFileError implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "fileName":
-            case "error":
-                yield \Closure::fromCallable('strval');
-                break;
+        return match($key) {
+            "fileName", "error" => [ strval(...) ],
+            default => []
         };
     }
 
@@ -64,10 +49,7 @@ class CreativeContentUploadResultFileError implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["fileName"] ?? null,
-            $constructorParams["error"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

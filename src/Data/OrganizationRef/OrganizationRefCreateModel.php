@@ -14,65 +14,15 @@ namespace BeelineOrd\Data\OrganizationRef;
  */
 class OrganizationRefCreateModel implements \JsonSerializable
 {
-    protected string $name;
-    protected string $okmsNumber;
-    protected OrganizationRefType $type;
-    protected ?string $mobilePhone;
-    protected ?string $epayNumber;
-    protected ?string $regNumber;
-    protected ?string $alternativeInn;
-
     public function __construct(
-        string $name,
-        string $okmsNumber,
-        OrganizationRefType $type,
-        ?string $mobilePhone = null,
-        ?string $epayNumber = null,
-        ?string $regNumber = null,
-        ?string $alternativeInn = null
+        public readonly string $name,
+        public readonly string $okmsNumber,
+        public readonly OrganizationRefType $type,
+        public readonly ?string $mobilePhone = null,
+        public readonly ?string $epayNumber = null,
+        public readonly ?string $regNumber = null,
+        public readonly ?string $alternativeInn = null
     ) {
-        $this->name = $name;
-        $this->okmsNumber = $okmsNumber;
-        $this->type = $type;
-        $this->mobilePhone = $mobilePhone;
-        $this->epayNumber = $epayNumber;
-        $this->regNumber = $regNumber;
-        $this->alternativeInn = $alternativeInn;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getOkmsNumber(): string
-    {
-        return $this->okmsNumber;
-    }
-
-    public function getType(): OrganizationRefType
-    {
-        return $this->type;
-    }
-
-    public function getMobilePhone(): ?string
-    {
-        return $this->mobilePhone;
-    }
-
-    public function getEpayNumber(): ?string
-    {
-        return $this->epayNumber;
-    }
-
-    public function getRegNumber(): ?string
-    {
-        return $this->regNumber;
-    }
-
-    public function getAlternativeInn(): ?string
-    {
-        return $this->alternativeInn;
     }
 
     protected static function required(): array
@@ -85,19 +35,12 @@ class OrganizationRefCreateModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "name":
-            case "okmsNumber":
-            case "mobilePhone":
-            case "epayNumber":
-            case "regNumber":
-            case "alternativeInn":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "type":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\OrganizationRef\OrganizationRefType', 'from' ], $data);
-                break;
+        return match($key) {
+            "name", "okmsNumber", "mobilePhone", "epayNumber", "regNumber", "alternativeInn" => [ strval(...) ],
+            "type" => [
+                fn ($data) => call_user_func([ '\BeelineOrd\Data\OrganizationRef\OrganizationRefType', 'from' ], $data)
+            ],
+            default => []
         };
     }
 
@@ -124,15 +67,7 @@ class OrganizationRefCreateModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["name"],
-            $constructorParams["okmsNumber"],
-            $constructorParams["type"],
-            $constructorParams["mobilePhone"] ?? null,
-            $constructorParams["epayNumber"] ?? null,
-            $constructorParams["regNumber"] ?? null,
-            $constructorParams["alternativeInn"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

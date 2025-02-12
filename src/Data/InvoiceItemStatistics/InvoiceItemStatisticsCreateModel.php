@@ -14,10 +14,6 @@ namespace BeelineOrd\Data\InvoiceItemStatistics;
  */
 class InvoiceItemStatisticsCreateModel extends InvoiceItemStatisticsEditModel implements \JsonSerializable
 {
-    protected int $invoiceItemId;
-    protected int $creativeId;
-    protected int $platformId;
-
     public function __construct(
         int $actualImpressionsCount,
         int $plannedImpressionsCount,
@@ -27,9 +23,9 @@ class InvoiceItemStatisticsCreateModel extends InvoiceItemStatisticsEditModel im
         \DateTimeInterface $actualEndDate,
         float $totalAmount,
         float $amountPerShow,
-        int $invoiceItemId,
-        int $creativeId,
-        int $platformId,
+        public readonly int $invoiceItemId,
+        public readonly int $creativeId,
+        public readonly int $platformId,
         ?bool $isVat = null
     ) {
         parent::__construct(
@@ -43,24 +39,6 @@ class InvoiceItemStatisticsCreateModel extends InvoiceItemStatisticsEditModel im
             $amountPerShow,
             $isVat
         );
-        $this->invoiceItemId = $invoiceItemId;
-        $this->creativeId = $creativeId;
-        $this->platformId = $platformId;
-    }
-
-    public function getInvoiceItemId(): int
-    {
-        return $this->invoiceItemId;
-    }
-
-    public function getCreativeId(): int
-    {
-        return $this->creativeId;
-    }
-
-    public function getPlatformId(): int
-    {
-        return $this->platformId;
     }
 
     protected static function defaults(): array
@@ -84,17 +62,9 @@ class InvoiceItemStatisticsCreateModel extends InvoiceItemStatisticsEditModel im
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "invoiceItemId":
-            case "creativeId":
-            case "platformId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "invoiceItemId", "creativeId", "platformId" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -124,20 +94,7 @@ class InvoiceItemStatisticsCreateModel extends InvoiceItemStatisticsEditModel im
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["actualImpressionsCount"],
-            $constructorParams["plannedImpressionsCount"],
-            $constructorParams["plannedStartDate"],
-            $constructorParams["plannedEndDate"],
-            $constructorParams["actualStartDate"],
-            $constructorParams["actualEndDate"],
-            $constructorParams["totalAmount"],
-            $constructorParams["amountPerShow"],
-            $constructorParams["invoiceItemId"],
-            $constructorParams["creativeId"],
-            $constructorParams["platformId"],
-            $constructorParams["isVat"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

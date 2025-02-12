@@ -65,9 +65,7 @@ class InvoiceItemStatisticsViewModel extends InvoiceItemStatisticsCreateModel im
      */
     protected static function importers(string $key): iterable
     {
-        if (method_exists(parent::class, "importers")) {
-            yield from parent::importers($key);
-        };
+        return method_exists(parent::class, "importers") ? parent::importers($key) : [];
     }
 
     /**
@@ -96,20 +94,7 @@ class InvoiceItemStatisticsViewModel extends InvoiceItemStatisticsCreateModel im
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["actualImpressionsCount"],
-            $constructorParams["plannedImpressionsCount"],
-            $constructorParams["plannedStartDate"],
-            $constructorParams["plannedEndDate"],
-            $constructorParams["actualStartDate"],
-            $constructorParams["actualEndDate"],
-            $constructorParams["totalAmount"],
-            $constructorParams["amountPerShow"],
-            $constructorParams["invoiceItemId"],
-            $constructorParams["creativeId"],
-            $constructorParams["platformId"],
-            $constructorParams["isVat"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

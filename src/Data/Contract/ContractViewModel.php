@@ -14,13 +14,6 @@ namespace BeelineOrd\Data\Contract;
  */
 class ContractViewModel extends ContractModel implements \JsonSerializable
 {
-    protected int $id;
-    protected ?int $parentContractId;
-    protected ?\DateTimeInterface $erirExportedOn;
-    protected ?\DateTimeInterface $erirPlannedExportDate;
-    protected ?int $erirExportedStatus;
-    protected ?bool $exportError;
-
     public function __construct(
         ContractType $type,
         bool $executorIsObligedForRegistration,
@@ -28,10 +21,10 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
         string $subjectType,
         string $number,
         \DateTimeInterface $date,
-        int $id,
+        public readonly int $id,
         ?float $amount = null,
         ?bool $isVat = null,
-        ?int $parentContractId = null,
+        public readonly ?int $parentContractId = null,
         ?int $customerId = null,
         ?int $executorId = null,
         ?bool $isInitialContract = null,
@@ -41,10 +34,10 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
         ?string $executorInn = null,
         ?string $executorName = null,
         ?ContractOrganizationType $executorType = null,
-        ?\DateTimeInterface $erirExportedOn = null,
-        ?\DateTimeInterface $erirPlannedExportDate = null,
-        ?int $erirExportedStatus = null,
-        ?bool $exportError = null
+        public readonly ?\DateTimeInterface $erirExportedOn = null,
+        public readonly ?\DateTimeInterface $erirPlannedExportDate = null,
+        public readonly ?int $erirExportedStatus = null,
+        public readonly ?bool $exportError = null
     ) {
         parent::__construct(
             $type,
@@ -66,42 +59,6 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
             $executorName,
             $executorType
         );
-        $this->id = $id;
-        $this->parentContractId = $parentContractId;
-        $this->erirExportedOn = $erirExportedOn;
-        $this->erirPlannedExportDate = $erirPlannedExportDate;
-        $this->erirExportedStatus = $erirExportedStatus;
-        $this->exportError = $exportError;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getParentContractId(): ?int
-    {
-        return $this->parentContractId;
-    }
-
-    public function getErirExportedOn(): ?\DateTimeInterface
-    {
-        return $this->erirExportedOn;
-    }
-
-    public function getErirPlannedExportDate(): ?\DateTimeInterface
-    {
-        return $this->erirPlannedExportDate;
-    }
-
-    public function getErirExportedStatus(): ?int
-    {
-        return $this->erirExportedStatus;
-    }
-
-    public function getExportError(): ?bool
-    {
-        return $this->exportError;
     }
 
     protected static function defaults(): array
@@ -125,26 +82,11 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-            case "parentContractId":
-            case "erirExportedStatus":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "erirExportedOn":
-            case "erirPlannedExportDate":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
-
-            case "exportError":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "id", "parentContractId", "erirExportedStatus" => [ intval(...) ],
+            "erirExportedOn", "erirPlannedExportDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            "exportError" => [ boolval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -174,31 +116,7 @@ class ContractViewModel extends ContractModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["type"],
-            $constructorParams["executorIsObligedForRegistration"],
-            $constructorParams["actionType"],
-            $constructorParams["subjectType"],
-            $constructorParams["number"],
-            $constructorParams["date"],
-            $constructorParams["id"],
-            $constructorParams["amount"] ?? null,
-            $constructorParams["isVat"] ?? null,
-            $constructorParams["parentContractId"] ?? null,
-            $constructorParams["customerId"] ?? null,
-            $constructorParams["executorId"] ?? null,
-            $constructorParams["isInitialContract"] ?? null,
-            $constructorParams["customerInn"] ?? null,
-            $constructorParams["customerName"] ?? null,
-            $constructorParams["customerType"] ?? null,
-            $constructorParams["executorInn"] ?? null,
-            $constructorParams["executorName"] ?? null,
-            $constructorParams["executorType"] ?? null,
-            $constructorParams["erirExportedOn"] ?? null,
-            $constructorParams["erirPlannedExportDate"] ?? null,
-            $constructorParams["erirExportedStatus"] ?? null,
-            $constructorParams["exportError"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

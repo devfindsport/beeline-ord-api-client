@@ -14,30 +14,11 @@ namespace BeelineOrd\Data\Contract;
  */
 class InitialContract implements \JsonSerializable
 {
-    protected int $id;
-    protected ?string $number;
-    protected ?\DateTimeInterface $date;
-
-    public function __construct(int $id, ?string $number = null, ?\DateTimeInterface $date = null)
-    {
-        $this->id = $id;
-        $this->number = $number;
-        $this->date = $date;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getNumber(): ?string
-    {
-        return $this->number;
-    }
-
-    public function getDate(): ?\DateTimeInterface
-    {
-        return $this->date;
+    public function __construct(
+        public readonly int $id,
+        public readonly ?string $number = null,
+        public readonly ?\DateTimeInterface $date = null
+    ) {
     }
 
     protected static function required(): array
@@ -50,18 +31,11 @@ class InitialContract implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "number":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "date":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
+        return match($key) {
+            "id" => [ intval(...) ],
+            "number" => [ strval(...) ],
+            "date" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            default => []
         };
     }
 
@@ -88,11 +62,7 @@ class InitialContract implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["id"],
-            $constructorParams["number"] ?? null,
-            $constructorParams["date"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

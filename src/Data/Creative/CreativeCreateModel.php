@@ -14,8 +14,10 @@ namespace BeelineOrd\Data\Creative;
  */
 class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
 {
-    protected ?int $organizationId;
-
+    /**
+     * @param array<CreativeUrl> $urls
+     * @param array<string> $kktuCode
+     */
     public function __construct(
         CreativeType $type,
         CreativeForm $form,
@@ -25,9 +27,9 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
         bool $isReadyForErir,
         int $initialContractId,
         array $urls = [],
-        ?array $okveds = [],
+        array $kktuCode = [],
         ?string $targetAudienceDescription = null,
-        ?int $organizationId = null
+        public readonly ?int $organizationId = null
     ) {
         parent::__construct(
             $type,
@@ -38,15 +40,9 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
             $isReadyForErir,
             $initialContractId,
             $urls,
-            $okveds,
+            $kktuCode,
             $targetAudienceDescription
         );
-        $this->organizationId = $organizationId;
-    }
-
-    public function getOrganizationId(): ?int
-    {
-        return $this->organizationId;
     }
 
     protected static function defaults(): array
@@ -70,15 +66,9 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "organizationId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "organizationId" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -108,19 +98,7 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["type"],
-            $constructorParams["form"],
-            $constructorParams["description"],
-            $constructorParams["isSocial"],
-            $constructorParams["isNative"],
-            $constructorParams["isReadyForErir"],
-            $constructorParams["initialContractId"],
-            $constructorParams["urls"],
-            $constructorParams["okveds"] ?? null,
-            $constructorParams["targetAudienceDescription"] ?? null,
-            $constructorParams["organizationId"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

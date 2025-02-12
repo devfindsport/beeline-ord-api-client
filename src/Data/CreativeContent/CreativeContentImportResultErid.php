@@ -14,23 +14,10 @@ namespace BeelineOrd\Data\CreativeContent;
  */
 class CreativeContentImportResultErid implements \JsonSerializable
 {
-    protected ?int $creativeId;
-    protected ?string $erid;
-
-    public function __construct(?int $creativeId = null, ?string $erid = null)
-    {
-        $this->creativeId = $creativeId;
-        $this->erid = $erid;
-    }
-
-    public function getCreativeId(): ?int
-    {
-        return $this->creativeId;
-    }
-
-    public function getErid(): ?string
-    {
-        return $this->erid;
+    public function __construct(
+        public readonly ?int $creativeId = null,
+        public readonly ?string $erid = null
+    ) {
     }
 
     /**
@@ -38,14 +25,10 @@ class CreativeContentImportResultErid implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "creativeId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "erid":
-                yield \Closure::fromCallable('strval');
-                break;
+        return match($key) {
+            "creativeId" => [ intval(...) ],
+            "erid" => [ strval(...) ],
+            default => []
         };
     }
 
@@ -67,10 +50,7 @@ class CreativeContentImportResultErid implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["creativeId"] ?? null,
-            $constructorParams["erid"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

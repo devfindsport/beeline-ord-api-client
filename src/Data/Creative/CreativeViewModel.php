@@ -14,29 +14,18 @@ namespace BeelineOrd\Data\Creative;
  */
 class CreativeViewModel extends CreativeListModel implements \JsonSerializable
 {
-    protected CreativeType $type;
-    protected CreativeForm $form;
-    protected string $description;
-    protected bool $isSocial;
-    protected bool $isNative;
-
-    /** @var array<CreativeUrl> $urls */
-    protected array $urls;
-
-    /** @var ?array<string> $okveds */
-    protected ?array $okveds;
-    protected ?string $targetAudienceDescription;
-    protected int $initialContractId;
-    protected ?int $organizationId;
-
+    /**
+     * @param array<CreativeUrl> $urls
+     * @param array<string> $kktuCode
+     */
     public function __construct(
         int $id,
-        string $description,
-        CreativeType $type,
-        CreativeForm $form,
-        bool $isSocial,
-        bool $isNative,
-        int $initialContractId,
+        public readonly string $description,
+        public readonly CreativeType $type,
+        public readonly CreativeForm $form,
+        public readonly bool $isSocial,
+        public readonly bool $isNative,
+        public readonly int $initialContractId,
         ?string $erid = null,
         ?\DateTimeInterface $erirExportedOn = null,
         ?\DateTimeInterface $erirPlannedExportDate = null,
@@ -44,10 +33,10 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
         ?string $exportError = null,
         ?int $selfPromotionOrganizationId = null,
         ?bool $isTelegram = null,
-        array $urls = [],
-        ?array $okveds = [],
-        ?string $targetAudienceDescription = null,
-        ?int $organizationId = null
+        public readonly array $urls = [],
+        public readonly array $kktuCode = [],
+        public readonly ?string $targetAudienceDescription = null,
+        public readonly ?int $organizationId = null
     ) {
         parent::__construct(
             $id,
@@ -60,74 +49,8 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
             $selfPromotionOrganizationId,
             $isTelegram
         );
-        $this->type = $type;
-        $this->form = $form;
-        $this->description = $description;
-        $this->isSocial = $isSocial;
-        $this->isNative = $isNative;
         $urls && (function(CreativeUrl ...$_) {})( ...$urls);
-        $this->urls = $urls;
-        $okveds && (function(string ...$_) {})( ...$okveds);
-        $this->okveds = $okveds;
-        $this->targetAudienceDescription = $targetAudienceDescription;
-        $this->initialContractId = $initialContractId;
-        $this->organizationId = $organizationId;
-    }
-
-    public function getType(): CreativeType
-    {
-        return $this->type;
-    }
-
-    public function getForm(): CreativeForm
-    {
-        return $this->form;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function getIsSocial(): bool
-    {
-        return $this->isSocial;
-    }
-
-    public function getIsNative(): bool
-    {
-        return $this->isNative;
-    }
-
-    /**
-     * @return array<CreativeUrl>
-     */
-    public function getUrls(): array
-    {
-        return $this->urls;
-    }
-
-    /**
-     * @return ?array<string>
-     */
-    public function getOkveds(): ?array
-    {
-        return $this->okveds;
-    }
-
-    public function getTargetAudienceDescription(): ?string
-    {
-        return $this->targetAudienceDescription;
-    }
-
-    public function getInitialContractId(): int
-    {
-        return $this->initialContractId;
-    }
-
-    public function getOrganizationId(): ?int
-    {
-        return $this->organizationId;
+        $kktuCode && (function(string ...$_) {})( ...$kktuCode);
     }
 
     protected static function defaults(): array
@@ -142,7 +65,7 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
     {
         return array_merge(
             method_exists(parent::class, "required") ? parent::required() : [],
-            ['type', 'form', 'description', 'isSocial', 'isNative', 'urls', 'initialContractId']
+            ['type', 'form', 'description', 'isSocial', 'isNative', 'urls', 'kktuCode', 'initialContractId']
         );
     }
 
@@ -151,48 +74,23 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "type":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeType', 'from' ], $data);
-                break;
-
-            case "form":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeForm', 'from' ], $data);
-                break;
-
-            case "description":
-            case "targetAudienceDescription":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "isSocial":
-            case "isNative":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            case "urls":
-                yield fn ($array) => array_map(
+        return match($key) {
+            "type" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeType', 'from' ], $data) ],
+            "form" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeForm', 'from' ], $data) ],
+            "description", "targetAudienceDescription" => [ strval(...) ],
+            "isSocial", "isNative" => [ boolval(...) ],
+            "urls" => [
+                fn ($array) => array_map(
                     fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeUrl', 'create' ], $data),
                     (array)$array
-                );
-                break;
-
-            case "okveds":
-                yield fn ($array) => array_map(
-                    \Closure::fromCallable('strval'),
-                    (array)$array
-                );
-                break;
-
-            case "initialContractId":
-            case "organizationId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+                )
+            ],
+            "kktuCode" => [ fn ($array) => array_map(
+                strval(...),
+                (array)$array
+            ) ],
+            "initialContractId", "organizationId" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -222,26 +120,7 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["id"],
-            $constructorParams["description"],
-            $constructorParams["type"],
-            $constructorParams["form"],
-            $constructorParams["isSocial"],
-            $constructorParams["isNative"],
-            $constructorParams["initialContractId"],
-            $constructorParams["erid"] ?? null,
-            $constructorParams["erirExportedOn"] ?? null,
-            $constructorParams["erirPlannedExportDate"] ?? null,
-            $constructorParams["erirExportedStatus"] ?? null,
-            $constructorParams["exportError"] ?? null,
-            $constructorParams["selfPromotionOrganizationId"] ?? null,
-            $constructorParams["isTelegram"] ?? null,
-            $constructorParams["urls"],
-            $constructorParams["okveds"] ?? null,
-            $constructorParams["targetAudienceDescription"] ?? null,
-            $constructorParams["organizationId"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

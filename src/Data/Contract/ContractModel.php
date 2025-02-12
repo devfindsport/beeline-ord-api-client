@@ -14,153 +14,26 @@ namespace BeelineOrd\Data\Contract;
  */
 class ContractModel implements \JsonSerializable
 {
-    protected ContractType $type;
-    protected bool $executorIsObligedForRegistration;
-    protected ContractActionType $actionType;
-    protected string $subjectType;
-    protected string $number;
-    protected \DateTimeInterface $date;
-    protected ?float $amount;
-    protected ?bool $isVat;
-    protected ?int $parentContractId;
-    protected ?int $customerId;
-    protected ?int $executorId;
-    protected ?bool $isInitialContract;
-    protected ?string $customerInn;
-    protected ?string $customerName;
-    protected ?ContractOrganizationType $customerType;
-    protected ?string $executorInn;
-    protected ?string $executorName;
-    protected ?ContractOrganizationType $executorType;
-
     public function __construct(
-        ContractType $type,
-        bool $executorIsObligedForRegistration,
-        ContractActionType $actionType,
-        string $subjectType,
-        string $number,
-        \DateTimeInterface $date,
-        ?float $amount = null,
-        ?bool $isVat = null,
-        ?int $parentContractId = null,
-        ?int $customerId = null,
-        ?int $executorId = null,
-        ?bool $isInitialContract = null,
-        ?string $customerInn = null,
-        ?string $customerName = null,
-        ?ContractOrganizationType $customerType = null,
-        ?string $executorInn = null,
-        ?string $executorName = null,
-        ?ContractOrganizationType $executorType = null
+        public readonly ContractType $type,
+        public readonly bool $executorIsObligedForRegistration,
+        public readonly ContractActionType $actionType,
+        public readonly string $subjectType,
+        public readonly string $number,
+        public readonly \DateTimeInterface $date,
+        public readonly ?float $amount = null,
+        public readonly ?bool $isVat = null,
+        public readonly ?int $parentContractId = null,
+        public readonly ?int $customerId = null,
+        public readonly ?int $executorId = null,
+        public readonly ?bool $isInitialContract = null,
+        public readonly ?string $customerInn = null,
+        public readonly ?string $customerName = null,
+        public readonly ?ContractOrganizationType $customerType = null,
+        public readonly ?string $executorInn = null,
+        public readonly ?string $executorName = null,
+        public readonly ?ContractOrganizationType $executorType = null
     ) {
-        $this->type = $type;
-        $this->executorIsObligedForRegistration = $executorIsObligedForRegistration;
-        $this->actionType = $actionType;
-        $this->subjectType = $subjectType;
-        $this->number = $number;
-        $this->date = $date;
-        $this->amount = $amount;
-        $this->isVat = $isVat;
-        $this->parentContractId = $parentContractId;
-        $this->customerId = $customerId;
-        $this->executorId = $executorId;
-        $this->isInitialContract = $isInitialContract;
-        $this->customerInn = $customerInn;
-        $this->customerName = $customerName;
-        $this->customerType = $customerType;
-        $this->executorInn = $executorInn;
-        $this->executorName = $executorName;
-        $this->executorType = $executorType;
-    }
-
-    public function getType(): ContractType
-    {
-        return $this->type;
-    }
-
-    public function getExecutorIsObligedForRegistration(): bool
-    {
-        return $this->executorIsObligedForRegistration;
-    }
-
-    public function getActionType(): ContractActionType
-    {
-        return $this->actionType;
-    }
-
-    public function getSubjectType(): string
-    {
-        return $this->subjectType;
-    }
-
-    public function getNumber(): string
-    {
-        return $this->number;
-    }
-
-    public function getDate(): \DateTimeInterface
-    {
-        return $this->date;
-    }
-
-    public function getAmount(): ?float
-    {
-        return $this->amount;
-    }
-
-    public function getIsVat(): ?bool
-    {
-        return $this->isVat;
-    }
-
-    public function getParentContractId(): ?int
-    {
-        return $this->parentContractId;
-    }
-
-    public function getCustomerId(): ?int
-    {
-        return $this->customerId;
-    }
-
-    public function getExecutorId(): ?int
-    {
-        return $this->executorId;
-    }
-
-    public function getIsInitialContract(): ?bool
-    {
-        return $this->isInitialContract;
-    }
-
-    public function getCustomerInn(): ?string
-    {
-        return $this->customerInn;
-    }
-
-    public function getCustomerName(): ?string
-    {
-        return $this->customerName;
-    }
-
-    public function getCustomerType(): ?ContractOrganizationType
-    {
-        return $this->customerType;
-    }
-
-    public function getExecutorInn(): ?string
-    {
-        return $this->executorInn;
-    }
-
-    public function getExecutorName(): ?string
-    {
-        return $this->executorName;
-    }
-
-    public function getExecutorType(): ?ContractOrganizationType
-    {
-        return $this->executorType;
     }
 
     protected static function required(): array
@@ -173,48 +46,20 @@ class ContractModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "type":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Contract\ContractType', 'from' ], $data);
-                break;
-
-            case "executorIsObligedForRegistration":
-            case "isVat":
-            case "isInitialContract":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            case "actionType":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Contract\ContractActionType', 'from' ], $data);
-                break;
-
-            case "subjectType":
-            case "number":
-            case "customerInn":
-            case "customerName":
-            case "executorInn":
-            case "executorName":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "date":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
-
-            case "amount":
-                yield \Closure::fromCallable('floatval');
-                break;
-
-            case "parentContractId":
-            case "customerId":
-            case "executorId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "customerType":
-            case "executorType":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Contract\ContractOrganizationType', 'from' ], $data);
-                break;
+        return match($key) {
+            "type" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Contract\ContractType', 'from' ], $data) ],
+            "executorIsObligedForRegistration", "isVat", "isInitialContract" => [ boolval(...) ],
+            "actionType" => [
+                fn ($data) => call_user_func([ '\BeelineOrd\Data\Contract\ContractActionType', 'from' ], $data)
+            ],
+            "subjectType", "number", "customerInn", "customerName", "executorInn", "executorName" => [ strval(...) ],
+            "date" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            "amount" => [ floatval(...) ],
+            "parentContractId", "customerId", "executorId" => [ intval(...) ],
+            "customerType", "executorType" => [
+                fn ($data) => call_user_func([ '\BeelineOrd\Data\Contract\ContractOrganizationType', 'from' ], $data)
+            ],
+            default => []
         };
     }
 
@@ -241,26 +86,7 @@ class ContractModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["type"],
-            $constructorParams["executorIsObligedForRegistration"],
-            $constructorParams["actionType"],
-            $constructorParams["subjectType"],
-            $constructorParams["number"],
-            $constructorParams["date"],
-            $constructorParams["amount"] ?? null,
-            $constructorParams["isVat"] ?? null,
-            $constructorParams["parentContractId"] ?? null,
-            $constructorParams["customerId"] ?? null,
-            $constructorParams["executorId"] ?? null,
-            $constructorParams["isInitialContract"] ?? null,
-            $constructorParams["customerInn"] ?? null,
-            $constructorParams["customerName"] ?? null,
-            $constructorParams["customerType"] ?? null,
-            $constructorParams["executorInn"] ?? null,
-            $constructorParams["executorName"] ?? null,
-            $constructorParams["executorType"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

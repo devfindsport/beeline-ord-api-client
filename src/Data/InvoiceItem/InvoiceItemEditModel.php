@@ -14,37 +14,12 @@ namespace BeelineOrd\Data\InvoiceItem;
  */
 class InvoiceItemEditModel implements \JsonSerializable
 {
-    protected ?string $name;
-    protected float $amount;
-    protected ?bool $isVat;
-    protected int $initialContractId;
-
-    public function __construct(float $amount, int $initialContractId, ?string $name = null, ?bool $isVat = null)
-    {
-        $this->name = $name;
-        $this->amount = $amount;
-        $this->isVat = $isVat;
-        $this->initialContractId = $initialContractId;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function getAmount(): float
-    {
-        return $this->amount;
-    }
-
-    public function getIsVat(): ?bool
-    {
-        return $this->isVat;
-    }
-
-    public function getInitialContractId(): int
-    {
-        return $this->initialContractId;
+    public function __construct(
+        public readonly float $amount,
+        public readonly int $initialContractId,
+        public readonly ?string $name = null,
+        public readonly ?bool $isVat = null
+    ) {
     }
 
     protected static function required(): array
@@ -57,22 +32,12 @@ class InvoiceItemEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "name":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "amount":
-                yield \Closure::fromCallable('floatval');
-                break;
-
-            case "isVat":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            case "initialContractId":
-                yield \Closure::fromCallable('intval');
-                break;
+        return match($key) {
+            "name" => [ strval(...) ],
+            "amount" => [ floatval(...) ],
+            "isVat" => [ boolval(...) ],
+            "initialContractId" => [ intval(...) ],
+            default => []
         };
     }
 
@@ -99,12 +64,7 @@ class InvoiceItemEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["amount"],
-            $constructorParams["initialContractId"],
-            $constructorParams["name"] ?? null,
-            $constructorParams["isVat"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

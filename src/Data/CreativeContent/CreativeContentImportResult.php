@@ -14,34 +14,16 @@ namespace BeelineOrd\Data\CreativeContent;
  */
 class CreativeContentImportResult implements \JsonSerializable
 {
-    /** @var ?array<CreativeContentImportResultErid> $erids */
-    protected ?array $erids;
-
-    /** @var ?array<int> $ids */
-    protected ?array $ids;
-
-    public function __construct(?array $erids = [], ?array $ids = [])
-    {
+    /**
+     * @param ?array<CreativeContentImportResultErid> $erids
+     * @param ?array<int> $ids
+     */
+    public function __construct(
+        public readonly ?array $erids = [],
+        public readonly ?array $ids = []
+    ) {
         $erids && (function(CreativeContentImportResultErid ...$_) {})( ...$erids);
-        $this->erids = $erids;
         $ids && (function(int ...$_) {})( ...$ids);
-        $this->ids = $ids;
-    }
-
-    /**
-     * @return ?array<CreativeContentImportResultErid>
-     */
-    public function getErids(): ?array
-    {
-        return $this->erids;
-    }
-
-    /**
-     * @return ?array<int>
-     */
-    public function getIds(): ?array
-    {
-        return $this->ids;
     }
 
     /**
@@ -49,20 +31,18 @@ class CreativeContentImportResult implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "erids":
-                yield fn ($array) => array_map(
+        return match($key) {
+            "erids" => [
+                fn ($array) => array_map(
                     fn ($data) => call_user_func([ '\BeelineOrd\Data\CreativeContent\CreativeContentImportResultErid', 'create' ], $data),
                     (array)$array
-                );
-                break;
-
-            case "ids":
-                yield fn ($array) => array_map(
-                    \Closure::fromCallable('intval'),
-                    (array)$array
-                );
-                break;
+                )
+            ],
+            "ids" => [ fn ($array) => array_map(
+                intval(...),
+                (array)$array
+            ) ],
+            default => []
         };
     }
 
@@ -84,10 +64,7 @@ class CreativeContentImportResult implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["erids"] ?? null,
-            $constructorParams["ids"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

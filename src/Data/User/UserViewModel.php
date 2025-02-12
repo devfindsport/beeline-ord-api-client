@@ -14,71 +14,19 @@ namespace BeelineOrd\Data\User;
  */
 class UserViewModel implements \JsonSerializable
 {
-    protected ?int $id;
-    protected ?int $organizationId;
-    protected ?string $username;
-    protected ?string $inn;
-    protected ?string $email;
-    protected ?string $role;
-
-    /** @var ?array<string> $permissions */
-    protected ?array $permissions;
-
-    public function __construct(
-        ?int $id = null,
-        ?int $organizationId = null,
-        ?string $username = null,
-        ?string $inn = null,
-        ?string $email = null,
-        ?string $role = null,
-        ?array $permissions = []
-    ) {
-        $this->id = $id;
-        $this->organizationId = $organizationId;
-        $this->username = $username;
-        $this->inn = $inn;
-        $this->email = $email;
-        $this->role = $role;
-        $permissions && (function(string ...$_) {})( ...$permissions);
-        $this->permissions = $permissions;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getOrganizationId(): ?int
-    {
-        return $this->organizationId;
-    }
-
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
-    public function getInn(): ?string
-    {
-        return $this->inn;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
     /**
-     * @return ?array<string>
+     * @param ?array<string> $permissions
      */
-    public function getPermissions(): ?array
-    {
-        return $this->permissions;
+    public function __construct(
+        public readonly ?int $id = null,
+        public readonly ?int $organizationId = null,
+        public readonly ?string $username = null,
+        public readonly ?string $inn = null,
+        public readonly ?string $email = null,
+        public readonly ?string $role = null,
+        public readonly ?array $permissions = []
+    ) {
+        $permissions && (function(string ...$_) {})( ...$permissions);
     }
 
     /**
@@ -86,25 +34,14 @@ class UserViewModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-            case "organizationId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "username":
-            case "inn":
-            case "email":
-            case "role":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "permissions":
-                yield fn ($array) => array_map(
-                    \Closure::fromCallable('strval'),
-                    (array)$array
-                );
-                break;
+        return match($key) {
+            "id", "organizationId" => [ intval(...) ],
+            "username", "inn", "email", "role" => [ strval(...) ],
+            "permissions" => [ fn ($array) => array_map(
+                strval(...),
+                (array)$array
+            ) ],
+            default => []
         };
     }
 
@@ -126,15 +63,7 @@ class UserViewModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["id"] ?? null,
-            $constructorParams["organizationId"] ?? null,
-            $constructorParams["username"] ?? null,
-            $constructorParams["inn"] ?? null,
-            $constructorParams["email"] ?? null,
-            $constructorParams["role"] ?? null,
-            $constructorParams["permissions"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

@@ -14,81 +14,17 @@ namespace BeelineOrd\Data\Creative;
  */
 class CreativeListModel implements \JsonSerializable
 {
-    protected int $id;
-    protected string $description;
-    protected ?string $erid;
-    protected ?\DateTimeInterface $erirExportedOn;
-    protected ?\DateTimeInterface $erirPlannedExportDate;
-    protected ?int $erirExportedStatus;
-    protected ?string $exportError;
-    protected ?int $selfPromotionOrganizationId;
-    protected ?bool $isTelegram;
-
     public function __construct(
-        int $id,
-        string $description,
-        ?string $erid = null,
-        ?\DateTimeInterface $erirExportedOn = null,
-        ?\DateTimeInterface $erirPlannedExportDate = null,
-        ?int $erirExportedStatus = null,
-        ?string $exportError = null,
-        ?int $selfPromotionOrganizationId = null,
-        ?bool $isTelegram = null
+        public readonly int $id,
+        public readonly string $description,
+        public readonly ?string $erid = null,
+        public readonly ?\DateTimeInterface $erirExportedOn = null,
+        public readonly ?\DateTimeInterface $erirPlannedExportDate = null,
+        public readonly ?int $erirExportedStatus = null,
+        public readonly ?string $exportError = null,
+        public readonly ?int $selfPromotionOrganizationId = null,
+        public readonly ?bool $isTelegram = null
     ) {
-        $this->id = $id;
-        $this->description = $description;
-        $this->erid = $erid;
-        $this->erirExportedOn = $erirExportedOn;
-        $this->erirPlannedExportDate = $erirPlannedExportDate;
-        $this->erirExportedStatus = $erirExportedStatus;
-        $this->exportError = $exportError;
-        $this->selfPromotionOrganizationId = $selfPromotionOrganizationId;
-        $this->isTelegram = $isTelegram;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function getErid(): ?string
-    {
-        return $this->erid;
-    }
-
-    public function getErirExportedOn(): ?\DateTimeInterface
-    {
-        return $this->erirExportedOn;
-    }
-
-    public function getErirPlannedExportDate(): ?\DateTimeInterface
-    {
-        return $this->erirPlannedExportDate;
-    }
-
-    public function getErirExportedStatus(): ?int
-    {
-        return $this->erirExportedStatus;
-    }
-
-    public function getExportError(): ?string
-    {
-        return $this->exportError;
-    }
-
-    public function getSelfPromotionOrganizationId(): ?int
-    {
-        return $this->selfPromotionOrganizationId;
-    }
-
-    public function getIsTelegram(): ?bool
-    {
-        return $this->isTelegram;
     }
 
     protected static function required(): array
@@ -101,27 +37,12 @@ class CreativeListModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-            case "erirExportedStatus":
-            case "selfPromotionOrganizationId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "description":
-            case "erid":
-            case "exportError":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "erirExportedOn":
-            case "erirPlannedExportDate":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
-
-            case "isTelegram":
-                yield \Closure::fromCallable('boolval');
-                break;
+        return match($key) {
+            "id", "erirExportedStatus", "selfPromotionOrganizationId" => [ intval(...) ],
+            "description", "erid", "exportError" => [ strval(...) ],
+            "erirExportedOn", "erirPlannedExportDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            "isTelegram" => [ boolval(...) ],
+            default => []
         };
     }
 
@@ -148,17 +69,7 @@ class CreativeListModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["id"],
-            $constructorParams["description"],
-            $constructorParams["erid"] ?? null,
-            $constructorParams["erirExportedOn"] ?? null,
-            $constructorParams["erirPlannedExportDate"] ?? null,
-            $constructorParams["erirExportedStatus"] ?? null,
-            $constructorParams["exportError"] ?? null,
-            $constructorParams["selfPromotionOrganizationId"] ?? null,
-            $constructorParams["isTelegram"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

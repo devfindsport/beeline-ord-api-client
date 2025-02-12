@@ -14,14 +14,12 @@ namespace BeelineOrd\Data\Invoice;
  */
 class InvoiceViewModel extends InvoiceCreateModel implements \JsonSerializable
 {
-    protected ?\DateTimeInterface $erirExportedOn;
-    protected ?\DateTimeInterface $erirPlannedExportDate;
-
     public function __construct(
         \DateTimeInterface $date,
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
         float $amount,
+        float $percentVat,
         InvoiceOrganizationRole $customerRole,
         InvoiceOrganizationRole $executorRole,
         bool $isReadyForErir,
@@ -29,14 +27,15 @@ class InvoiceViewModel extends InvoiceCreateModel implements \JsonSerializable
         InvoiceType $type,
         ?string $number = null,
         ?bool $isVat = null,
-        ?\DateTimeInterface $erirExportedOn = null,
-        ?\DateTimeInterface $erirPlannedExportDate = null
+        public readonly ?\DateTimeInterface $erirExportedOn = null,
+        public readonly ?\DateTimeInterface $erirPlannedExportDate = null
     ) {
         parent::__construct(
             $date,
             $startDate,
             $endDate,
             $amount,
+            $percentVat,
             $customerRole,
             $executorRole,
             $isReadyForErir,
@@ -45,18 +44,6 @@ class InvoiceViewModel extends InvoiceCreateModel implements \JsonSerializable
             $number,
             $isVat
         );
-        $this->erirExportedOn = $erirExportedOn;
-        $this->erirPlannedExportDate = $erirPlannedExportDate;
-    }
-
-    public function getErirExportedOn(): ?\DateTimeInterface
-    {
-        return $this->erirExportedOn;
-    }
-
-    public function getErirPlannedExportDate(): ?\DateTimeInterface
-    {
-        return $this->erirPlannedExportDate;
     }
 
     protected static function defaults(): array
@@ -80,16 +67,9 @@ class InvoiceViewModel extends InvoiceCreateModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "erirExportedOn":
-            case "erirPlannedExportDate":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "erirExportedOn", "erirPlannedExportDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -119,21 +99,7 @@ class InvoiceViewModel extends InvoiceCreateModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["date"],
-            $constructorParams["startDate"],
-            $constructorParams["endDate"],
-            $constructorParams["amount"],
-            $constructorParams["customerRole"],
-            $constructorParams["executorRole"],
-            $constructorParams["isReadyForErir"],
-            $constructorParams["contractId"],
-            $constructorParams["type"],
-            $constructorParams["number"] ?? null,
-            $constructorParams["isVat"] ?? null,
-            $constructorParams["erirExportedOn"] ?? null,
-            $constructorParams["erirPlannedExportDate"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

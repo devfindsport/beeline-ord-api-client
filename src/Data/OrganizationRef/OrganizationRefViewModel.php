@@ -14,25 +14,17 @@ namespace BeelineOrd\Data\OrganizationRef;
  */
 class OrganizationRefViewModel extends OrganizationRefCreateModel implements \JsonSerializable
 {
-    protected int $id;
-
     public function __construct(
         string $name,
         string $okmsNumber,
         OrganizationRefType $type,
-        int $id,
+        public readonly int $id,
         ?string $mobilePhone = null,
         ?string $epayNumber = null,
         ?string $regNumber = null,
         ?string $alternativeInn = null
     ) {
         parent::__construct($name, $okmsNumber, $type, $mobilePhone, $epayNumber, $regNumber, $alternativeInn);
-        $this->id = $id;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 
     protected static function defaults(): array
@@ -56,15 +48,9 @@ class OrganizationRefViewModel extends OrganizationRefCreateModel implements \Js
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "id" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -94,16 +80,7 @@ class OrganizationRefViewModel extends OrganizationRefCreateModel implements \Js
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["name"],
-            $constructorParams["okmsNumber"],
-            $constructorParams["type"],
-            $constructorParams["id"],
-            $constructorParams["mobilePhone"] ?? null,
-            $constructorParams["epayNumber"] ?? null,
-            $constructorParams["regNumber"] ?? null,
-            $constructorParams["alternativeInn"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

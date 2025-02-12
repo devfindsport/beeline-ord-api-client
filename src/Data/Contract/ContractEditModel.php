@@ -14,8 +14,6 @@ namespace BeelineOrd\Data\Contract;
  */
 class ContractEditModel extends ContractModel implements \JsonSerializable
 {
-    protected bool $isReadyForErir;
-
     public function __construct(
         ContractType $type,
         bool $executorIsObligedForRegistration,
@@ -23,7 +21,7 @@ class ContractEditModel extends ContractModel implements \JsonSerializable
         string $subjectType,
         string $number,
         \DateTimeInterface $date,
-        bool $isReadyForErir,
+        public readonly bool $isReadyForErir,
         ?float $amount = null,
         ?bool $isVat = null,
         ?int $parentContractId = null,
@@ -57,12 +55,6 @@ class ContractEditModel extends ContractModel implements \JsonSerializable
             $executorName,
             $executorType
         );
-        $this->isReadyForErir = $isReadyForErir;
-    }
-
-    public function getIsReadyForErir(): bool
-    {
-        return $this->isReadyForErir;
     }
 
     protected static function defaults(): array
@@ -86,15 +78,9 @@ class ContractEditModel extends ContractModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "isReadyForErir":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "isReadyForErir" => [ boolval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -124,27 +110,7 @@ class ContractEditModel extends ContractModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["type"],
-            $constructorParams["executorIsObligedForRegistration"],
-            $constructorParams["actionType"],
-            $constructorParams["subjectType"],
-            $constructorParams["number"],
-            $constructorParams["date"],
-            $constructorParams["isReadyForErir"],
-            $constructorParams["amount"] ?? null,
-            $constructorParams["isVat"] ?? null,
-            $constructorParams["parentContractId"] ?? null,
-            $constructorParams["customerId"] ?? null,
-            $constructorParams["executorId"] ?? null,
-            $constructorParams["isInitialContract"] ?? null,
-            $constructorParams["customerInn"] ?? null,
-            $constructorParams["customerName"] ?? null,
-            $constructorParams["customerType"] ?? null,
-            $constructorParams["executorInn"] ?? null,
-            $constructorParams["executorName"] ?? null,
-            $constructorParams["executorType"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

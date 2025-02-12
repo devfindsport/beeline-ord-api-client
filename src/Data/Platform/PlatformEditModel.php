@@ -14,37 +14,12 @@ namespace BeelineOrd\Data\Platform;
  */
 class PlatformEditModel implements \JsonSerializable
 {
-    protected string $name;
-    protected string $url;
-    protected bool $isOwned;
-    protected PlatformType $type;
-
-    public function __construct(string $name, string $url, bool $isOwned, PlatformType $type)
-    {
-        $this->name = $name;
-        $this->url = $url;
-        $this->isOwned = $isOwned;
-        $this->type = $type;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    public function getIsOwned(): bool
-    {
-        return $this->isOwned;
-    }
-
-    public function getType(): PlatformType
-    {
-        return $this->type;
+    public function __construct(
+        public readonly string $name,
+        public readonly string $url,
+        public readonly bool $isOwned,
+        public readonly PlatformType $type
+    ) {
     }
 
     protected static function required(): array
@@ -57,19 +32,11 @@ class PlatformEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "name":
-            case "url":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "isOwned":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            case "type":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Platform\PlatformType', 'from' ], $data);
-                break;
+        return match($key) {
+            "name", "url" => [ strval(...) ],
+            "isOwned" => [ boolval(...) ],
+            "type" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Platform\PlatformType', 'from' ], $data) ],
+            default => []
         };
     }
 
@@ -96,12 +63,7 @@ class PlatformEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["name"],
-            $constructorParams["url"],
-            $constructorParams["isOwned"],
-            $constructorParams["type"]
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

@@ -14,37 +14,15 @@ namespace BeelineOrd\Data\CreativeContent;
  */
 class CreativeContentViewModel extends CreativeContentCreateModel implements \JsonSerializable
 {
-    protected int $id;
-    protected ?string $description;
-    protected ?string $mediaExampleUrl;
-
     public function __construct(
         int $creativeId,
-        int $id,
+        public readonly int $id,
         ?string $textData = null,
         ?string $hash = null,
-        ?string $description = null,
-        ?string $mediaExampleUrl = null
+        public readonly ?string $description = null,
+        public readonly ?string $mediaExampleUrl = null
     ) {
         parent::__construct($creativeId, $textData, $hash);
-        $this->id = $id;
-        $this->description = $description;
-        $this->mediaExampleUrl = $mediaExampleUrl;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function getMediaExampleUrl(): ?string
-    {
-        return $this->mediaExampleUrl;
     }
 
     protected static function defaults(): array
@@ -68,20 +46,10 @@ class CreativeContentViewModel extends CreativeContentCreateModel implements \Js
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "description":
-            case "mediaExampleUrl":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "id" => [ intval(...) ],
+            "description", "mediaExampleUrl" => [ strval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -111,14 +79,7 @@ class CreativeContentViewModel extends CreativeContentCreateModel implements \Js
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["creativeId"],
-            $constructorParams["id"],
-            $constructorParams["textData"] ?? null,
-            $constructorParams["hash"] ?? null,
-            $constructorParams["description"] ?? null,
-            $constructorParams["mediaExampleUrl"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

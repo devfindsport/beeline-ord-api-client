@@ -14,17 +14,12 @@ namespace BeelineOrd\Data\CreativeContent;
  */
 class CreativeContentCreateModel extends CreativeContentEditModel implements \JsonSerializable
 {
-    protected int $creativeId;
-
-    public function __construct(int $creativeId, ?string $textData = null, ?string $hash = null)
-    {
+    public function __construct(
+        public readonly int $creativeId,
+        ?string $textData = null,
+        ?string $hash = null
+    ) {
         parent::__construct($textData, $hash);
-        $this->creativeId = $creativeId;
-    }
-
-    public function getCreativeId(): int
-    {
-        return $this->creativeId;
     }
 
     protected static function defaults(): array
@@ -48,15 +43,9 @@ class CreativeContentCreateModel extends CreativeContentEditModel implements \Js
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "creativeId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "creativeId" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -86,11 +75,7 @@ class CreativeContentCreateModel extends CreativeContentEditModel implements \Js
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["creativeId"],
-            $constructorParams["textData"] ?? null,
-            $constructorParams["hash"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

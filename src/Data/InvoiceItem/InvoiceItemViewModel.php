@@ -14,23 +14,15 @@ namespace BeelineOrd\Data\InvoiceItem;
  */
 class InvoiceItemViewModel extends InvoiceItemCreateModel implements \JsonSerializable
 {
-    protected int $id;
-
     public function __construct(
         float $amount,
         int $initialContractId,
         int $invoiceId,
-        int $id,
+        public readonly int $id,
         ?string $name = null,
         ?bool $isVat = null
     ) {
         parent::__construct($amount, $initialContractId, $invoiceId, $name, $isVat);
-        $this->id = $id;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 
     protected static function defaults(): array
@@ -54,15 +46,9 @@ class InvoiceItemViewModel extends InvoiceItemCreateModel implements \JsonSerial
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "id":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "id" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -92,14 +78,7 @@ class InvoiceItemViewModel extends InvoiceItemCreateModel implements \JsonSerial
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["amount"],
-            $constructorParams["initialContractId"],
-            $constructorParams["invoiceId"],
-            $constructorParams["id"],
-            $constructorParams["name"] ?? null,
-            $constructorParams["isVat"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

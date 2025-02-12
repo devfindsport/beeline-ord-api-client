@@ -14,22 +14,14 @@ namespace BeelineOrd\Data\Platform;
  */
 class PlatformCreateModel extends PlatformEditModel implements \JsonSerializable
 {
-    protected ?int $organizationId;
-
     public function __construct(
         string $name,
         string $url,
         bool $isOwned,
         PlatformType $type,
-        ?int $organizationId = null
+        public readonly ?int $organizationId = null
     ) {
         parent::__construct($name, $url, $isOwned, $type);
-        $this->organizationId = $organizationId;
-    }
-
-    public function getOrganizationId(): ?int
-    {
-        return $this->organizationId;
     }
 
     protected static function defaults(): array
@@ -53,15 +45,9 @@ class PlatformCreateModel extends PlatformEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "organizationId":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            default:
-                if (method_exists(parent::class, "importers")) {
-                    yield from parent::importers($key);
-                };
+        return match($key) {
+            "organizationId" => [ intval(...) ],
+            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }
 
@@ -91,13 +77,7 @@ class PlatformCreateModel extends PlatformEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["name"],
-            $constructorParams["url"],
-            $constructorParams["isOwned"],
-            $constructorParams["type"],
-            $constructorParams["organizationId"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

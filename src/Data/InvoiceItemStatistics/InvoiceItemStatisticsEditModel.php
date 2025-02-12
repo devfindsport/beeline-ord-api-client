@@ -14,81 +14,17 @@ namespace BeelineOrd\Data\InvoiceItemStatistics;
  */
 class InvoiceItemStatisticsEditModel implements \JsonSerializable
 {
-    protected int $actualImpressionsCount;
-    protected int $plannedImpressionsCount;
-    protected \DateTimeInterface $plannedStartDate;
-    protected \DateTimeInterface $plannedEndDate;
-    protected \DateTimeInterface $actualStartDate;
-    protected \DateTimeInterface $actualEndDate;
-    protected float $totalAmount;
-    protected float $amountPerShow;
-    protected ?bool $isVat;
-
     public function __construct(
-        int $actualImpressionsCount,
-        int $plannedImpressionsCount,
-        \DateTimeInterface $plannedStartDate,
-        \DateTimeInterface $plannedEndDate,
-        \DateTimeInterface $actualStartDate,
-        \DateTimeInterface $actualEndDate,
-        float $totalAmount,
-        float $amountPerShow,
-        ?bool $isVat = null
+        public readonly int $actualImpressionsCount,
+        public readonly int $plannedImpressionsCount,
+        public readonly \DateTimeInterface $plannedStartDate,
+        public readonly \DateTimeInterface $plannedEndDate,
+        public readonly \DateTimeInterface $actualStartDate,
+        public readonly \DateTimeInterface $actualEndDate,
+        public readonly float $totalAmount,
+        public readonly float $amountPerShow,
+        public readonly ?bool $isVat = null
     ) {
-        $this->actualImpressionsCount = $actualImpressionsCount;
-        $this->plannedImpressionsCount = $plannedImpressionsCount;
-        $this->plannedStartDate = $plannedStartDate;
-        $this->plannedEndDate = $plannedEndDate;
-        $this->actualStartDate = $actualStartDate;
-        $this->actualEndDate = $actualEndDate;
-        $this->totalAmount = $totalAmount;
-        $this->amountPerShow = $amountPerShow;
-        $this->isVat = $isVat;
-    }
-
-    public function getActualImpressionsCount(): int
-    {
-        return $this->actualImpressionsCount;
-    }
-
-    public function getPlannedImpressionsCount(): int
-    {
-        return $this->plannedImpressionsCount;
-    }
-
-    public function getPlannedStartDate(): \DateTimeInterface
-    {
-        return $this->plannedStartDate;
-    }
-
-    public function getPlannedEndDate(): \DateTimeInterface
-    {
-        return $this->plannedEndDate;
-    }
-
-    public function getActualStartDate(): \DateTimeInterface
-    {
-        return $this->actualStartDate;
-    }
-
-    public function getActualEndDate(): \DateTimeInterface
-    {
-        return $this->actualEndDate;
-    }
-
-    public function getTotalAmount(): float
-    {
-        return $this->totalAmount;
-    }
-
-    public function getAmountPerShow(): float
-    {
-        return $this->amountPerShow;
-    }
-
-    public function getIsVat(): ?bool
-    {
-        return $this->isVat;
     }
 
     protected static function required(): array
@@ -110,27 +46,12 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "actualImpressionsCount":
-            case "plannedImpressionsCount":
-                yield \Closure::fromCallable('intval');
-                break;
-
-            case "plannedStartDate":
-            case "plannedEndDate":
-            case "actualStartDate":
-            case "actualEndDate":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
-
-            case "totalAmount":
-            case "amountPerShow":
-                yield \Closure::fromCallable('floatval');
-                break;
-
-            case "isVat":
-                yield \Closure::fromCallable('boolval');
-                break;
+        return match($key) {
+            "actualImpressionsCount", "plannedImpressionsCount" => [ intval(...) ],
+            "plannedStartDate", "plannedEndDate", "actualStartDate", "actualEndDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            "totalAmount", "amountPerShow" => [ floatval(...) ],
+            "isVat" => [ boolval(...) ],
+            default => []
         };
     }
 
@@ -157,17 +78,7 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["actualImpressionsCount"],
-            $constructorParams["plannedImpressionsCount"],
-            $constructorParams["plannedStartDate"],
-            $constructorParams["plannedEndDate"],
-            $constructorParams["actualStartDate"],
-            $constructorParams["actualEndDate"],
-            $constructorParams["totalAmount"],
-            $constructorParams["amountPerShow"],
-            $constructorParams["isVat"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

@@ -14,86 +14,23 @@ namespace BeelineOrd\Data\Invoice;
  */
 class InvoiceEditModel implements \JsonSerializable
 {
-    protected ?string $number;
-    protected \DateTimeInterface $date;
-    protected \DateTimeInterface $startDate;
-    protected \DateTimeInterface $endDate;
-    protected float $amount;
-    protected ?bool $isVat;
-    protected InvoiceOrganizationRole $customerRole;
-    protected InvoiceOrganizationRole $executorRole;
-    protected bool $isReadyForErir;
-
     public function __construct(
-        \DateTimeInterface $date,
-        \DateTimeInterface $startDate,
-        \DateTimeInterface $endDate,
-        float $amount,
-        InvoiceOrganizationRole $customerRole,
-        InvoiceOrganizationRole $executorRole,
-        bool $isReadyForErir,
-        ?string $number = null,
-        ?bool $isVat = null
+        public readonly \DateTimeInterface $date,
+        public readonly \DateTimeInterface $startDate,
+        public readonly \DateTimeInterface $endDate,
+        public readonly float $amount,
+        public readonly float $percentVat,
+        public readonly InvoiceOrganizationRole $customerRole,
+        public readonly InvoiceOrganizationRole $executorRole,
+        public readonly bool $isReadyForErir,
+        public readonly ?string $number = null,
+        public readonly ?bool $isVat = null
     ) {
-        $this->number = $number;
-        $this->date = $date;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->amount = $amount;
-        $this->isVat = $isVat;
-        $this->customerRole = $customerRole;
-        $this->executorRole = $executorRole;
-        $this->isReadyForErir = $isReadyForErir;
-    }
-
-    public function getNumber(): ?string
-    {
-        return $this->number;
-    }
-
-    public function getDate(): \DateTimeInterface
-    {
-        return $this->date;
-    }
-
-    public function getStartDate(): \DateTimeInterface
-    {
-        return $this->startDate;
-    }
-
-    public function getEndDate(): \DateTimeInterface
-    {
-        return $this->endDate;
-    }
-
-    public function getAmount(): float
-    {
-        return $this->amount;
-    }
-
-    public function getIsVat(): ?bool
-    {
-        return $this->isVat;
-    }
-
-    public function getCustomerRole(): InvoiceOrganizationRole
-    {
-        return $this->customerRole;
-    }
-
-    public function getExecutorRole(): InvoiceOrganizationRole
-    {
-        return $this->executorRole;
-    }
-
-    public function getIsReadyForErir(): bool
-    {
-        return $this->isReadyForErir;
     }
 
     protected static function required(): array
     {
-        return ['date', 'startDate', 'endDate', 'amount', 'customerRole', 'executorRole', 'isReadyForErir'];
+        return ['date', 'startDate', 'endDate', 'amount', 'percentVat', 'customerRole', 'executorRole', 'isReadyForErir'];
     }
 
     /**
@@ -101,30 +38,15 @@ class InvoiceEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "number":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "date":
-            case "startDate":
-            case "endDate":
-                yield static fn ($d) => new \DateTimeImmutable($d);
-                break;
-
-            case "amount":
-                yield \Closure::fromCallable('floatval');
-                break;
-
-            case "isVat":
-            case "isReadyForErir":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            case "customerRole":
-            case "executorRole":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Invoice\InvoiceOrganizationRole', 'from' ], $data);
-                break;
+        return match($key) {
+            "number" => [ strval(...) ],
+            "date", "startDate", "endDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            "amount", "percentVat" => [ floatval(...) ],
+            "isVat", "isReadyForErir" => [ boolval(...) ],
+            "customerRole", "executorRole" => [
+                fn ($data) => call_user_func([ '\BeelineOrd\Data\Invoice\InvoiceOrganizationRole', 'from' ], $data)
+            ],
+            default => []
         };
     }
 
@@ -151,17 +73,7 @@ class InvoiceEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["date"],
-            $constructorParams["startDate"],
-            $constructorParams["endDate"],
-            $constructorParams["amount"],
-            $constructorParams["customerRole"],
-            $constructorParams["executorRole"],
-            $constructorParams["isReadyForErir"],
-            $constructorParams["number"] ?? null,
-            $constructorParams["isVat"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

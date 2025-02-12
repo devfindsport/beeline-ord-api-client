@@ -14,13 +14,10 @@ namespace BeelineOrd\Data\CreativeContent;
  */
 class CreativeContentEditModel implements \JsonSerializable
 {
-    protected ?string $textData;
-    protected ?string $hash;
-
-    public function __construct(?string $textData = null, ?string $hash = null)
-    {
-        $this->textData = $textData;
-        $this->hash = $hash;
+    public function __construct(
+        public readonly ?string $textData = null,
+        public readonly ?string $hash = null
+    ) {
         $this->validate([
             'hash' => [
                 '#1' => function () {
@@ -36,16 +33,6 @@ class CreativeContentEditModel implements \JsonSerializable
         ]);
     }
 
-    public function getTextData(): ?string
-    {
-        return $this->textData;
-    }
-
-    public function getHash(): ?string
-    {
-        return $this->hash;
-    }
-
     protected function validate(array $rules): void
     {
         array_walk($rules, fn(&$vs, $f) => array_walk($vs, fn(&$v) => $v = false === call_user_func($v, $this->{$f})));
@@ -58,11 +45,9 @@ class CreativeContentEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "textData":
-            case "hash":
-                yield \Closure::fromCallable('strval');
-                break;
+        return match($key) {
+            "textData", "hash" => [ strval(...) ],
+            default => []
         };
     }
 
@@ -84,10 +69,7 @@ class CreativeContentEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["textData"] ?? null,
-            $constructorParams["hash"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array

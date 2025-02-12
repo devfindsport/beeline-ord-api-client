@@ -14,106 +14,39 @@ namespace BeelineOrd\Data\Creative;
  */
 class CreativeEditModel implements \JsonSerializable
 {
-    protected CreativeType $type;
-    protected CreativeForm $form;
-    protected string $description;
-    protected bool $isSocial;
-    protected bool $isNative;
-
-    /** @var array<CreativeUrl> $urls */
-    protected array $urls;
-
-    /** @var ?array<string> $okveds */
-    protected ?array $okveds;
-    protected ?string $targetAudienceDescription;
-    protected bool $isReadyForErir;
-    protected int $initialContractId;
-
+    /**
+     * @param array<CreativeUrl> $urls
+     * @param array<string> $kktuCode
+     */
     public function __construct(
-        CreativeType $type,
-        CreativeForm $form,
-        string $description,
-        bool $isSocial,
-        bool $isNative,
-        bool $isReadyForErir,
-        int $initialContractId,
-        array $urls = [],
-        ?array $okveds = [],
-        ?string $targetAudienceDescription = null
+        public readonly CreativeType $type,
+        public readonly CreativeForm $form,
+        public readonly string $description,
+        public readonly bool $isSocial,
+        public readonly bool $isNative,
+        public readonly bool $isReadyForErir,
+        public readonly int $initialContractId,
+        public readonly array $urls = [],
+        public readonly array $kktuCode = [],
+        public readonly ?string $targetAudienceDescription = null
     ) {
-        $this->type = $type;
-        $this->form = $form;
-        $this->description = $description;
-        $this->isSocial = $isSocial;
-        $this->isNative = $isNative;
         $urls && (function(CreativeUrl ...$_) {})( ...$urls);
-        $this->urls = $urls;
-        $okveds && (function(string ...$_) {})( ...$okveds);
-        $this->okveds = $okveds;
-        $this->targetAudienceDescription = $targetAudienceDescription;
-        $this->isReadyForErir = $isReadyForErir;
-        $this->initialContractId = $initialContractId;
-    }
-
-    public function getType(): CreativeType
-    {
-        return $this->type;
-    }
-
-    public function getForm(): CreativeForm
-    {
-        return $this->form;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function getIsSocial(): bool
-    {
-        return $this->isSocial;
-    }
-
-    public function getIsNative(): bool
-    {
-        return $this->isNative;
-    }
-
-    /**
-     * @return array<CreativeUrl>
-     */
-    public function getUrls(): array
-    {
-        return $this->urls;
-    }
-
-    /**
-     * @return ?array<string>
-     */
-    public function getOkveds(): ?array
-    {
-        return $this->okveds;
-    }
-
-    public function getTargetAudienceDescription(): ?string
-    {
-        return $this->targetAudienceDescription;
-    }
-
-    public function getIsReadyForErir(): bool
-    {
-        return $this->isReadyForErir;
-    }
-
-    public function getInitialContractId(): int
-    {
-        return $this->initialContractId;
+        $kktuCode && (function(string ...$_) {})( ...$kktuCode);
     }
 
     protected static function required(): array
     {
-        return ['type', 'form', 'description', 'isSocial', 'isNative', 'urls', 'isReadyForErir', 'initialContractId'];
+        return [
+            'type',
+            'form',
+            'description',
+            'isSocial',
+            'isNative',
+            'urls',
+            'kktuCode',
+            'isReadyForErir',
+            'initialContractId',
+        ];
     }
 
     /**
@@ -121,43 +54,23 @@ class CreativeEditModel implements \JsonSerializable
      */
     protected static function importers(string $key): iterable
     {
-        switch ($key) {
-            case "type":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeType', 'from' ], $data);
-                break;
-
-            case "form":
-                yield fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeForm', 'from' ], $data);
-                break;
-
-            case "description":
-            case "targetAudienceDescription":
-                yield \Closure::fromCallable('strval');
-                break;
-
-            case "isSocial":
-            case "isNative":
-            case "isReadyForErir":
-                yield \Closure::fromCallable('boolval');
-                break;
-
-            case "urls":
-                yield fn ($array) => array_map(
+        return match($key) {
+            "type" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeType', 'from' ], $data) ],
+            "form" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeForm', 'from' ], $data) ],
+            "description", "targetAudienceDescription" => [ strval(...) ],
+            "isSocial", "isNative", "isReadyForErir" => [ boolval(...) ],
+            "urls" => [
+                fn ($array) => array_map(
                     fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeUrl', 'create' ], $data),
                     (array)$array
-                );
-                break;
-
-            case "okveds":
-                yield fn ($array) => array_map(
-                    \Closure::fromCallable('strval'),
-                    (array)$array
-                );
-                break;
-
-            case "initialContractId":
-                yield \Closure::fromCallable('intval');
-                break;
+                )
+            ],
+            "kktuCode" => [ fn ($array) => array_map(
+                strval(...),
+                (array)$array
+            ) ],
+            "initialContractId" => [ intval(...) ],
+            default => []
         };
     }
 
@@ -184,18 +97,7 @@ class CreativeEditModel implements \JsonSerializable
 
         // create
         /** @psalm-suppress PossiblyNullArgument */
-        return new static(
-            $constructorParams["type"],
-            $constructorParams["form"],
-            $constructorParams["description"],
-            $constructorParams["isSocial"],
-            $constructorParams["isNative"],
-            $constructorParams["isReadyForErir"],
-            $constructorParams["initialContractId"],
-            $constructorParams["urls"],
-            $constructorParams["okveds"] ?? null,
-            $constructorParams["targetAudienceDescription"] ?? null
-        );
+        return new static(...$constructorParams);
     }
 
     public function toArray(): array
