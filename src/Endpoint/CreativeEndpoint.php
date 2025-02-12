@@ -53,7 +53,7 @@ class CreativeEndpoint
     public function create(CreativeCreateModel $createModel): int
     {
         $result = $this->import([$createModel]);
-        $ids = $result->getIds();
+        $ids = $result->ids;
         if (empty($ids)) {
             throw new \UnexpectedValueException('Method did not return created ID');
         }
@@ -95,7 +95,7 @@ class CreativeEndpoint
     public function createContent(CreativeContentCreateModel $createModel): CreativeContentImportResultErid
     {
         $result = $this->importContent([$createModel]);
-        $erids = $result->getErids();
+        $erids = $result->erids;
         if (empty($erids)) {
             throw new \UnexpectedValueException('Method did not return created ID');
         }

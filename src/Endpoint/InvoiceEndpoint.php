@@ -25,7 +25,7 @@ class InvoiceEndpoint
     public function create(InvoiceCreateModel $createModel): int
     {
         $result = $this->import([$createModel]);
-        $ids = $result->getIds();
+        $ids = $result->ids;
         if (empty($ids)) {
             throw new \UnexpectedValueException('Method did not return created ID');
         }
@@ -36,7 +36,7 @@ class InvoiceEndpoint
     public function createContent(InvoiceItemCreateModel $createModel): int
     {
         $result = $this->importItem([$createModel]);
-        $ids = $result->getIds();
+        $ids = $result->ids;
         if (empty($ids)) {
             throw new \UnexpectedValueException('Method did not return created ID');
         }
@@ -47,7 +47,7 @@ class InvoiceEndpoint
     public function createStatistics(InvoiceItemStatisticsCreateModel $createModel)
     {
         $result = $this->importStatistics([$createModel]);
-        $ids = $result->getIds();
+        $ids = $result->ids;
         if (empty($ids)) {
             throw new \UnexpectedValueException('Method did not return created ID');
         }
