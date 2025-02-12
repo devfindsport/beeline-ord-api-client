@@ -12,53 +12,16 @@ namespace BeelineOrd\Data\Creative;
  * @link https://github.com/klkvsk/dto-generator
  * @link https://packagist.org/klkvsk/dto-generator
  */
-class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
+class KktuCode implements \JsonSerializable
 {
-    /**
-     * @param array<CreativeUrl> $urls
-     * @param array<KktuCode> $kktuCode
-     */
     public function __construct(
-        CreativeType $type,
-        CreativeForm $form,
-        string $description,
-        bool $isSocial,
-        bool $isNative,
-        bool $isReadyForErir,
-        int $initialContractId,
-        array $urls = [],
-        array $kktuCode = [],
-        ?string $targetAudienceDescription = null,
-        public readonly ?int $organizationId = null
+        public readonly string $code
     ) {
-        parent::__construct(
-            $type,
-            $form,
-            $description,
-            $isSocial,
-            $isNative,
-            $isReadyForErir,
-            $initialContractId,
-            $urls,
-            $kktuCode,
-            $targetAudienceDescription
-        );
-    }
-
-    protected static function defaults(): array
-    {
-        return array_merge(
-            method_exists(parent::class, "defaults") ? parent::defaults() : [],
-            []
-        );
     }
 
     protected static function required(): array
     {
-        return array_merge(
-            method_exists(parent::class, "required") ? parent::required() : [],
-            []
-        );
+        return ['code'];
     }
 
     /**
@@ -67,8 +30,8 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
     protected static function importers(string $key): iterable
     {
         return match($key) {
-            "organizationId" => [ intval(...) ],
-            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
+            "code" => [ strval(...) ],
+            default => []
         };
     }
 
@@ -77,9 +40,6 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
      */
     public static function create(array $data): self
     {
-        // defaults
-        $data += static::defaults();
-
         // check required
         if ($diff = array_diff(static::required(), array_keys($data))) {
             throw new \InvalidArgumentException("missing keys: " . implode(", ", $diff));

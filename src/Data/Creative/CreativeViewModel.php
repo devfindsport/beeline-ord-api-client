@@ -16,7 +16,7 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
 {
     /**
      * @param array<CreativeUrl> $urls
-     * @param array<string> $kktuCode
+     * @param array<KktuCode> $kktuCode
      */
     public function __construct(
         int $id,
@@ -50,7 +50,7 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
             $isTelegram
         );
         $urls && (function(CreativeUrl ...$_) {})( ...$urls);
-        $kktuCode && (function(string ...$_) {})( ...$kktuCode);
+        $kktuCode && (function(KktuCode ...$_) {})( ...$kktuCode);
     }
 
     protected static function defaults(): array
@@ -85,10 +85,12 @@ class CreativeViewModel extends CreativeListModel implements \JsonSerializable
                     (array)$array
                 )
             ],
-            "kktuCode" => [ fn ($array) => array_map(
-                strval(...),
-                (array)$array
-            ) ],
+            "kktuCode" => [
+                fn ($array) => array_map(
+                    fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\KktuCode', 'create' ], $data),
+                    (array)$array
+                )
+            ],
             "initialContractId", "organizationId" => [ intval(...) ],
             default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
