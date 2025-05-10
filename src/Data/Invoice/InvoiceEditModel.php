@@ -20,17 +20,31 @@ class InvoiceEditModel implements \JsonSerializable
         public readonly \DateTimeInterface $endDate,
         public readonly float $amount,
         public readonly float $percentVat,
+        public readonly float $vat,
+        public readonly float $fullAmount,
+        public readonly string $generalType,
         public readonly InvoiceOrganizationRole $customerRole,
         public readonly InvoiceOrganizationRole $executorRole,
         public readonly bool $isReadyForErir,
-        public readonly ?string $number = null,
-        public readonly ?bool $isVat = null
+        public readonly ?string $number = null
     ) {
     }
 
     protected static function required(): array
     {
-        return ['date', 'startDate', 'endDate', 'amount', 'percentVat', 'customerRole', 'executorRole', 'isReadyForErir'];
+        return [
+            'date',
+            'startDate',
+            'endDate',
+            'amount',
+            'percentVat',
+            'vat',
+            'fullAmount',
+            'generalType',
+            'customerRole',
+            'executorRole',
+            'isReadyForErir',
+        ];
     }
 
     /**
@@ -39,13 +53,13 @@ class InvoiceEditModel implements \JsonSerializable
     protected static function importers(string $key): iterable
     {
         return match($key) {
-            "number" => [ strval(...) ],
+            "number", "generalType" => [ strval(...) ],
             "date", "startDate", "endDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
-            "amount", "percentVat" => [ floatval(...) ],
-            "isVat", "isReadyForErir" => [ boolval(...) ],
+            "amount", "percentVat", "vat", "fullAmount" => [ floatval(...) ],
             "customerRole", "executorRole" => [
                 fn ($data) => call_user_func([ '\BeelineOrd\Data\Invoice\InvoiceOrganizationRole', 'from' ], $data)
             ],
+            "isReadyForErir" => [ boolval(...) ],
             default => []
         };
     }

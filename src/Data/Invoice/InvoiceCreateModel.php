@@ -20,13 +20,15 @@ class InvoiceCreateModel extends InvoiceEditModel implements \JsonSerializable
         \DateTimeInterface $endDate,
         float $amount,
         float $percentVat,
+        float $vat,
+        float $fullAmount,
+        string $generalType,
         InvoiceOrganizationRole $customerRole,
         InvoiceOrganizationRole $executorRole,
         bool $isReadyForErir,
         public readonly int $contractId,
         public readonly InvoiceType $type,
-        ?string $number = null,
-        ?bool $isVat = null
+        ?string $number = null
     ) {
         parent::__construct(
             $date,
@@ -34,11 +36,13 @@ class InvoiceCreateModel extends InvoiceEditModel implements \JsonSerializable
             $endDate,
             $amount,
             $percentVat,
+            $vat,
+            $fullAmount,
+            $generalType,
             $customerRole,
             $executorRole,
             $isReadyForErir,
-            $number,
-            $isVat
+            $number
         );
     }
 

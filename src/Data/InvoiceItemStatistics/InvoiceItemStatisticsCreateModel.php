@@ -22,11 +22,13 @@ class InvoiceItemStatisticsCreateModel extends InvoiceItemStatisticsEditModel im
         \DateTimeInterface $actualStartDate,
         \DateTimeInterface $actualEndDate,
         float $totalAmount,
+        float $percentVat,
+        float $vat,
+        float $fullAmount,
         float $amountPerShow,
         public readonly int $invoiceItemId,
         public readonly int $creativeId,
-        public readonly int $platformId,
-        ?bool $isVat = null
+        public readonly int $platformId
     ) {
         parent::__construct(
             $actualImpressionsCount,
@@ -36,8 +38,10 @@ class InvoiceItemStatisticsCreateModel extends InvoiceItemStatisticsEditModel im
             $actualStartDate,
             $actualEndDate,
             $totalAmount,
-            $amountPerShow,
-            $isVat
+            $percentVat,
+            $vat,
+            $fullAmount,
+            $amountPerShow
         );
     }
 

@@ -22,8 +22,7 @@ class CreativeEditModel implements \JsonSerializable
         public readonly CreativeType $type,
         public readonly CreativeForm $form,
         public readonly string $description,
-        public readonly bool $isSocial,
-        public readonly bool $isNative,
+        public readonly bool $isSocialQuota,
         public readonly bool $isReadyForErir,
         public readonly int $initialContractId,
         public readonly array $urls = [],
@@ -36,17 +35,7 @@ class CreativeEditModel implements \JsonSerializable
 
     protected static function required(): array
     {
-        return [
-            'type',
-            'form',
-            'description',
-            'isSocial',
-            'isNative',
-            'urls',
-            'kktuCode',
-            'isReadyForErir',
-            'initialContractId',
-        ];
+        return ['type', 'form', 'description', 'isSocialQuota', 'urls', 'kktuCode', 'isReadyForErir', 'initialContractId'];
     }
 
     /**
@@ -58,7 +47,7 @@ class CreativeEditModel implements \JsonSerializable
             "type" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeType', 'from' ], $data) ],
             "form" => [ fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeForm', 'from' ], $data) ],
             "description", "targetAudienceDescription" => [ strval(...) ],
-            "isSocial", "isNative", "isReadyForErir" => [ boolval(...) ],
+            "isSocialQuota", "isReadyForErir" => [ boolval(...) ],
             "urls" => [
                 fn ($array) => array_map(
                     fn ($data) => call_user_func([ '\BeelineOrd\Data\Creative\CreativeUrl', 'create' ], $data),

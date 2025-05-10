@@ -1,6 +1,5 @@
 .idea
 .env*
-Makefile
 *.iml
 /vendor
 /composer.lock

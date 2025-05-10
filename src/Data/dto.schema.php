@@ -166,8 +166,7 @@ return dto\schema(
                 dto\field('type', t\enum('Creative\\CreativeType'), true),
                 dto\field('form', t\enum('Creative\\CreativeForm'), true),
                 dto\field('description', t\string(), true),
-                dto\field('isSocial', t\bool(), true),
-                dto\field('isNative', t\bool(), true),
+                dto\field('isSocialQuota', t\bool(), true),
                 dto\field('urls', t\list_(t\object('Creative\\CreativeUrl')), true),
                 dto\field('kktuCode', t\list_(t\object('Creative\\KktuCode')), true),
                 dto\field('targetAudienceDescription', t\string()),
@@ -281,6 +280,39 @@ return dto\schema(
         ),
         // ---
 
+        // CREATIVE ITEM STATISTICS
+        dto\object(
+            name: 'CreativeStatistics\\CreativeStatisticsEditModel',
+            fields: [
+                dto\field('actualImpressionsCount', t\int(), true),
+                dto\field('plannedImpressionsCount', t\int(), true),
+                dto\field('plannedStartDate', t\date(), true),
+                dto\field('plannedEndDate', t\date(), true),
+                dto\field('actualStartDate', t\date(), true),
+                dto\field('actualEndDate', t\date(), true),
+                dto\field('totalAmount', t\float(), true),
+                dto\field('percentVat', t\float(), true),
+                dto\field('vat', t\float(), true),
+                dto\field('fullAmount', t\float(), true),
+                dto\field('amountPerShow', t\float(), true),
+                dto\field('platformId', t\int(), true)
+            ]
+        ),
+        dto\object(
+            name: 'CreativeStatistics\\CreativeStatisticsCreateModel',
+            extends: 'CreativeStatistics\\CreativeStatisticsEditModel',
+            fields: [
+                dto\field('creativeId', t\int(), true),
+            ]
+        ),
+        dto\object(
+            name: 'CreativeStatistics\\CreativeStatisticsViewModel',
+            extends: 'CreativeStatistics\\CreativeStatisticsCreateModel',
+            fields: [
+                dto\field('id', t\int(), true)
+            ]
+        ),
+
         // INVOICE:
         dto\enum(
             name: 'Invoice\\InvoiceType',
@@ -299,7 +331,9 @@ return dto\schema(
                 dto\field('endDate', t\date(), true),
                 dto\field('amount', t\float(), true),
                 dto\field('percentVat', t\float(), true),
-                dto\field('isVat', t\bool()),
+                dto\field('vat', t\float(), true),
+                dto\field('fullAmount', t\float(), true),
+                dto\field('generalType', t\string(), true),
                 dto\field('customerRole', t\enum('Invoice\\InvoiceOrganizationRole'), true),
                 dto\field('executorRole', t\enum('Invoice\\InvoiceOrganizationRole'), true),
                 dto\field('isReadyForErir', t\bool(), true),
@@ -372,8 +406,10 @@ return dto\schema(
                 dto\field('actualStartDate', t\date(), true),
                 dto\field('actualEndDate', t\date(), true),
                 dto\field('totalAmount', t\float(), true),
-                dto\field('amountPerShow', t\float(), true),
-                dto\field('isVat', t\bool()),
+                dto\field('percentVat', t\float(), true),
+                dto\field('vat', t\float(), true),
+                dto\field('fullAmount', t\float(), true),
+                dto\field('amountPerShow', t\float(), true)
             ]
         ),
         dto\object(

@@ -1,0 +1,8 @@
+services:
+    beeline-ord-api-client:
+        image: composer:2.7
+        container_name: beeline_ord_api_client
+        command: tail -f /dev/null
+        working_dir: /app
+        volumes:
+            - .:/app

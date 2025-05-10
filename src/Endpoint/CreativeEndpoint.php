@@ -13,6 +13,8 @@ use BeelineOrd\Data\CreativeContent\CreativeContentImportResult;
 use BeelineOrd\Data\CreativeContent\CreativeContentImportResultErid;
 use BeelineOrd\Data\CreativeContent\CreativeContentUploadResult;
 use BeelineOrd\Data\CreativeContent\CreativeContentViewModel;
+use BeelineOrd\Data\CreativeStatistics\CreativeStatisticsCreateModel;
+use BeelineOrd\Data\CreativeStatistics\CreativeStatisticsEditModel;
 use BeelineOrd\Exception\FileException;
 use BeelineOrd\Request\Creative\CreativeGetAllRequest;
 use BeelineOrd\Request\Creative\CreativeGetRequest;
@@ -27,6 +29,8 @@ use BeelineOrd\Request\CreativeContent\CreativeContentPatchAllRequest;
 use BeelineOrd\Request\CreativeContent\CreativeContentPatchRequest;
 use BeelineOrd\Request\CreativeContent\CreativeContentPostAllRequest;
 use BeelineOrd\Request\CreativeContent\CreativeContentPostFilesRequest;
+use BeelineOrd\Request\CreativeStatistics\CreativeStatisticsPatchAllRequest;
+use BeelineOrd\Request\CreativeStatistics\CreativeStatisticsPatchRequest;
 
 class CreativeEndpoint
 {
@@ -117,7 +121,6 @@ class CreativeEndpoint
         return $this->client->send(new CreativeContentPatchAllRequest($create, $update));
     }
 
-
     public function deleteContent(int $creativeContentId)
     {
         return $this->client->send(new CreativeContentDeleteRequest($creativeContentId));
@@ -142,5 +145,39 @@ class CreativeEndpoint
     public function uploadContentArchive(int $creativeContentId, string $archiveFilename): CreativeContentUploadResult
     {
         return $this->client->send(new CreativeContentPostAllRequest($creativeContentId, $archiveFilename));
+    }
+
+    /**
+     * @param list<CreativeStatisticsCreateModel> $create
+     * @param array<int, CreativeStatisticsEditModel> $update
+     * @return array
+     */
+    public function importStatistics(array $create = [], array $update = [])
+    {
+        return $this->client->send(new CreativeStatisticsPatchAllRequest($create, $update));
+    }
+
+    /**
+     * @param CreativeStatisticsCreateModel $createModel
+     * @return array<int>
+     */
+    public function createStatistics(CreativeStatisticsCreateModel $createModel): array
+    {
+        return $this->importStatistics([$createModel]);
+    }
+
+    /**
+     * @param int                         $creativeStatisticsId
+     * @param CreativeStatisticsEditModel $editModel
+     * @return array
+     * @throws \BeelineOrd\Exception\ApiException
+     * @throws \BeelineOrd\Exception\BadRequestException
+     * @throws \BeelineOrd\Exception\NotFoundException
+     * @throws \BeelineOrd\Exception\ResponseValidationException
+     * @throws \BeelineOrd\Exception\UnauthorizedException
+     */
+    public function updateStatistics(int $creativeStatisticsId, CreativeStatisticsEditModel $editModel): array
+    {
+        return $this->client->send(new CreativeStatisticsPatchRequest($creativeStatisticsId, $editModel));
     }
 }

@@ -20,13 +20,15 @@ class InvoiceViewModel extends InvoiceCreateModel implements \JsonSerializable
         \DateTimeInterface $endDate,
         float $amount,
         float $percentVat,
+        float $vat,
+        float $fullAmount,
+        string $generalType,
         InvoiceOrganizationRole $customerRole,
         InvoiceOrganizationRole $executorRole,
         bool $isReadyForErir,
         int $contractId,
         InvoiceType $type,
         ?string $number = null,
-        ?bool $isVat = null,
         public readonly ?\DateTimeInterface $erirExportedOn = null,
         public readonly ?\DateTimeInterface $erirPlannedExportDate = null
     ) {
@@ -36,13 +38,15 @@ class InvoiceViewModel extends InvoiceCreateModel implements \JsonSerializable
             $endDate,
             $amount,
             $percentVat,
+            $vat,
+            $fullAmount,
+            $generalType,
             $customerRole,
             $executorRole,
             $isReadyForErir,
             $contractId,
             $type,
-            $number,
-            $isVat
+            $number
         );
     }
 

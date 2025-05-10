@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BeelineOrd\Data\Creative;
+namespace BeelineOrd\Data\CreativeStatistics;
 
 /**
  * This class is auto-generated with klkvsk/dto-generator
@@ -12,51 +12,40 @@ namespace BeelineOrd\Data\Creative;
  * @link https://github.com/klkvsk/dto-generator
  * @link https://packagist.org/klkvsk/dto-generator
  */
-class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
+class CreativeStatisticsEditModel implements \JsonSerializable
 {
-    /**
-     * @param array<CreativeUrl> $urls
-     * @param array<KktuCode> $kktuCode
-     */
     public function __construct(
-        CreativeType $type,
-        CreativeForm $form,
-        string $description,
-        bool $isSocialQuota,
-        bool $isReadyForErir,
-        int $initialContractId,
-        array $urls = [],
-        array $kktuCode = [],
-        ?string $targetAudienceDescription = null,
-        public readonly ?int $organizationId = null
+        public readonly int $actualImpressionsCount,
+        public readonly int $plannedImpressionsCount,
+        public readonly \DateTimeInterface $plannedStartDate,
+        public readonly \DateTimeInterface $plannedEndDate,
+        public readonly \DateTimeInterface $actualStartDate,
+        public readonly \DateTimeInterface $actualEndDate,
+        public readonly float $totalAmount,
+        public readonly float $percentVat,
+        public readonly float $vat,
+        public readonly float $fullAmount,
+        public readonly float $amountPerShow,
+        public readonly int $platformId
     ) {
-        parent::__construct(
-            $type,
-            $form,
-            $description,
-            $isSocialQuota,
-            $isReadyForErir,
-            $initialContractId,
-            $urls,
-            $kktuCode,
-            $targetAudienceDescription
-        );
-    }
-
-    protected static function defaults(): array
-    {
-        return array_merge(
-            method_exists(parent::class, "defaults") ? parent::defaults() : [],
-            []
-        );
     }
 
     protected static function required(): array
     {
-        return array_merge(
-            method_exists(parent::class, "required") ? parent::required() : [],
-            []
-        );
+        return [
+            'actualImpressionsCount',
+            'plannedImpressionsCount',
+            'plannedStartDate',
+            'plannedEndDate',
+            'actualStartDate',
+            'actualEndDate',
+            'totalAmount',
+            'percentVat',
+            'vat',
+            'fullAmount',
+            'amountPerShow',
+            'platformId',
+        ];
     }
 
     /**
@@ -65,8 +54,10 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
     protected static function importers(string $key): iterable
     {
         return match($key) {
-            "organizationId" => [ intval(...) ],
-            default => method_exists(parent::class, "importers") ? parent::importers($key) : []
+            "actualImpressionsCount", "plannedImpressionsCount", "platformId" => [ intval(...) ],
+            "plannedStartDate", "plannedEndDate", "actualStartDate", "actualEndDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
+            "totalAmount", "percentVat", "vat", "fullAmount", "amountPerShow" => [ floatval(...) ],
+            default => []
         };
     }
 
@@ -75,9 +66,6 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
      */
     public static function create(array $data): self
     {
-        // defaults
-        $data += static::defaults();
-
         // check required
         if ($diff = array_diff(static::required(), array_keys($data))) {
             throw new \InvalidArgumentException("missing keys: " . implode(", ", $diff));

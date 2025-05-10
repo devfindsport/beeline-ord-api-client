@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BeelineOrd\Data\Creative;
+namespace BeelineOrd\Data\CreativeStatistics;
 
 /**
  * This class is auto-generated with klkvsk/dto-generator
@@ -12,34 +12,38 @@ namespace BeelineOrd\Data\Creative;
  * @link https://github.com/klkvsk/dto-generator
  * @link https://packagist.org/klkvsk/dto-generator
  */
-class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
+class CreativeStatisticsViewModel extends CreativeStatisticsCreateModel implements \JsonSerializable
 {
-    /**
-     * @param array<CreativeUrl> $urls
-     * @param array<KktuCode> $kktuCode
-     */
     public function __construct(
-        CreativeType $type,
-        CreativeForm $form,
-        string $description,
-        bool $isSocialQuota,
-        bool $isReadyForErir,
-        int $initialContractId,
-        array $urls = [],
-        array $kktuCode = [],
-        ?string $targetAudienceDescription = null,
-        public readonly ?int $organizationId = null
+        int $actualImpressionsCount,
+        int $plannedImpressionsCount,
+        \DateTimeInterface $plannedStartDate,
+        \DateTimeInterface $plannedEndDate,
+        \DateTimeInterface $actualStartDate,
+        \DateTimeInterface $actualEndDate,
+        float $totalAmount,
+        float $percentVat,
+        float $vat,
+        float $fullAmount,
+        float $amountPerShow,
+        int $platformId,
+        int $creativeId,
+        public readonly int $id
     ) {
         parent::__construct(
-            $type,
-            $form,
-            $description,
-            $isSocialQuota,
-            $isReadyForErir,
-            $initialContractId,
-            $urls,
-            $kktuCode,
-            $targetAudienceDescription
+            $actualImpressionsCount,
+            $plannedImpressionsCount,
+            $plannedStartDate,
+            $plannedEndDate,
+            $actualStartDate,
+            $actualEndDate,
+            $totalAmount,
+            $percentVat,
+            $vat,
+            $fullAmount,
+            $amountPerShow,
+            $platformId,
+            $creativeId
         );
     }
 
@@ -55,7 +59,7 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
     {
         return array_merge(
             method_exists(parent::class, "required") ? parent::required() : [],
-            []
+            ['id']
         );
     }
 
@@ -65,7 +69,7 @@ class CreativeCreateModel extends CreativeEditModel implements \JsonSerializable
     protected static function importers(string $key): iterable
     {
         return match($key) {
-            "organizationId" => [ intval(...) ],
+            "id" => [ intval(...) ],
             default => method_exists(parent::class, "importers") ? parent::importers($key) : []
         };
     }

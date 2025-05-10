@@ -22,8 +22,10 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
         public readonly \DateTimeInterface $actualStartDate,
         public readonly \DateTimeInterface $actualEndDate,
         public readonly float $totalAmount,
-        public readonly float $amountPerShow,
-        public readonly ?bool $isVat = null
+        public readonly float $percentVat,
+        public readonly float $vat,
+        public readonly float $fullAmount,
+        public readonly float $amountPerShow
     ) {
     }
 
@@ -37,6 +39,9 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
             'actualStartDate',
             'actualEndDate',
             'totalAmount',
+            'percentVat',
+            'vat',
+            'fullAmount',
             'amountPerShow',
         ];
     }
@@ -49,8 +54,7 @@ class InvoiceItemStatisticsEditModel implements \JsonSerializable
         return match($key) {
             "actualImpressionsCount", "plannedImpressionsCount" => [ intval(...) ],
             "plannedStartDate", "plannedEndDate", "actualStartDate", "actualEndDate" => [ static fn ($d) => new \DateTimeImmutable($d) ],
-            "totalAmount", "amountPerShow" => [ floatval(...) ],
-            "isVat" => [ boolval(...) ],
+            "totalAmount", "percentVat", "vat", "fullAmount", "amountPerShow" => [ floatval(...) ],
             default => []
         };
     }
