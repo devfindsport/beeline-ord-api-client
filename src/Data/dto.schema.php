@@ -369,7 +369,9 @@ return dto\schema(
             fields: [
                 dto\field('name', t\string()),
                 dto\field('amount', t\float(), true),
-                dto\field('isVat', t\bool()),
+                dto\field('fullAmount', t\float(), true),
+                dto\field('vat', t\float(), true),
+                dto\field('percentVat', t\float(), true),
                 dto\field('initialContractId', t\int(), true),
             ]
         ),

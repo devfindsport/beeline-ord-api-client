@@ -16,15 +16,17 @@ class InvoiceItemEditModel implements \JsonSerializable
 {
     public function __construct(
         public readonly float $amount,
+        public readonly float $fullAmount,
+        public readonly float $vat,
+        public readonly float $percentVat,
         public readonly int $initialContractId,
-        public readonly ?string $name = null,
-        public readonly ?bool $isVat = null
+        public readonly ?string $name = null
     ) {
     }
 
     protected static function required(): array
     {
-        return ['amount', 'initialContractId'];
+        return ['amount', 'fullAmount', 'vat', 'percentVat', 'initialContractId'];
     }
 
     /**
@@ -34,8 +36,7 @@ class InvoiceItemEditModel implements \JsonSerializable
     {
         return match($key) {
             "name" => [ strval(...) ],
-            "amount" => [ floatval(...) ],
-            "isVat" => [ boolval(...) ],
+            "amount", "fullAmount", "vat", "percentVat" => [ floatval(...) ],
             "initialContractId" => [ intval(...) ],
             default => []
         };

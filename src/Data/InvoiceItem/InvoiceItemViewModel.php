@@ -16,13 +16,15 @@ class InvoiceItemViewModel extends InvoiceItemCreateModel implements \JsonSerial
 {
     public function __construct(
         float $amount,
+        float $fullAmount,
+        float $vat,
+        float $percentVat,
         int $initialContractId,
         int $invoiceId,
         public readonly int $id,
-        ?string $name = null,
-        ?bool $isVat = null
+        ?string $name = null
     ) {
-        parent::__construct($amount, $initialContractId, $invoiceId, $name, $isVat);
+        parent::__construct($amount, $fullAmount, $vat, $percentVat, $initialContractId, $invoiceId, $name);
     }
 
     protected static function defaults(): array
